@@ -67,7 +67,7 @@ namespace NodeCore.Realization.DijkstraAStarAlg
                 if (queue.Count == 0 || activeNode == Finish)
                     break;
 
-                var minNode = Helper.NodeFlightBirdSearch(queue, Finish.Point);
+                var minNode = NodeFlightBirdSearch(queue, Finish.Point);
                 queue.Remove(minNode);// для оптимизации удаления можно использовать HashSet
                 activeNode = minNode;
             } while (true);
@@ -78,7 +78,7 @@ namespace NodeCore.Realization.DijkstraAStarAlg
             }
             else
             {
-                var newFinish = Helper.NodeFlightBirdSearch(checkedNodes.Select(x => x.Key), Finish.Point);
+                var newFinish = NodeFlightBirdSearch(checkedNodes.Select(x => x.Key), Finish.Point);
 
                 return RecoverPuth(checkedNodes, Start, newFinish /*nearNode.Item2*/);
             }

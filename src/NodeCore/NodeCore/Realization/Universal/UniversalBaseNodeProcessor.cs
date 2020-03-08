@@ -80,7 +80,7 @@ namespace NodeCore.Realization.Universal
             }
             else
             {
-                var newFinish = Helper.NodeFlightBirdSearch(checkedNodes.Select(x => x.Key), Finish.Point);
+                var newFinish = NodeFlightBirdSearch(checkedNodes.Select(x => x.Key), Finish.Point);
 
                 return RecoverPuth(checkedNodes, Start, newFinish /*nearNode.Item2*/);
             }
@@ -118,6 +118,24 @@ namespace NodeCore.Realization.Universal
             }
 
             return result;
+        }
+
+        protected INode<T> NodeFlightBirdSearch<T>(IEnumerable<INode<T>> Collection, Point3D Finish)
+        {
+            var res = Collection.First();
+            var minL = Helper.CalculateDistance(res.Point, Finish);
+
+            foreach (var n in Collection.Skip(1))
+            {
+                var newL = Helper.CalculateDistance(n.Point, Finish);
+                if (minL > newL)
+                {
+                    minL = newL;
+                    res = n;
+                }
+            }
+
+            return res;
         }
         #endregion
     }
