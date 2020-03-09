@@ -48,7 +48,7 @@ namespace NodeCore.Base
             hash = hash * 23 + X;
             hash = hash * 23 + Y;
             hash = hash * 23 + Z;
-            return hash;
+            return hash % 3 == 0 ? -hash : hash;
 
             //return ToString().GetHashCode();
         }

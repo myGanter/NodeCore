@@ -120,7 +120,7 @@ namespace NodeCore.Realization.Universal
             return result;
         }
 
-        protected INode<T> NodeFlightBirdSearch<T>(IEnumerable<INode<T>> Collection, Point3D Finish)
+        protected INode<T> NodeFlightBirdSearch(IEnumerable<INode<T>> Collection, Point3D Finish)
         {
             var res = Collection.First();
             var minL = Helper.CalculateDistance(res.Point, Finish);
