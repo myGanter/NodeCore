@@ -3,19 +3,22 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using WinFormsTest.Core.Interfaces.IViews;
 
-namespace WinFormsTest
+namespace WinFormsTest.Views
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form, ImainForm
     {
-        public Form1()
+        public MainForm()
         {
             InitializeComponent();
         }
 
+        public new void Show() 
+        {
+            Application.Run(this);
+        }
     }
 }

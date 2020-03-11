@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using WinFormsTest.Core.IOC;
 using System.Windows.Forms;
+using Ninject;
+using WinFormsTest.Presenters;
 
 namespace WinFormsTest
 {
@@ -17,7 +17,12 @@ namespace WinFormsTest
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Form1());
+
+            var iocConf = new NinjectConfigure();
+            var kernel = new StandardKernel(iocConf);
+            var appFactory = new NinjectAppFactory(kernel);
+
+            appFactory.Run<MainPresenter>();
         }
     }
 }
