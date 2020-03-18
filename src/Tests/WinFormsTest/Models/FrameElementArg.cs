@@ -4,7 +4,7 @@ using System.Text;
 
 namespace WinFormsTest.Models
 {
-    public class TestModel
+    public class FrameElementArg
     {
     }
 }

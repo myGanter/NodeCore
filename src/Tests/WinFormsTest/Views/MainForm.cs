@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Threading.Tasks;
 using System.Drawing;
 using System.Text;
 using System.Windows.Forms;
@@ -14,11 +15,32 @@ namespace WinFormsTest.Views
         public MainForm()
         {
             InitializeComponent();
+            StartBtn.Click += StartBtn_Click;
         }
 
-        public new void Show() 
+        public event Func<Type, Task> Start;
+
+        public void BuildTests(List<Tuple<Type, string>> Data)
+        {
+            TestsCombo.DataSource = Data;
+            TestsCombo.DisplayMember = "Item2";
+            TestsCombo.ValueMember = "Item1";
+        }
+
+        public new void Show()
         {
             Application.Run(this);
+        }
+
+        private async void StartBtn_Click(object sender, EventArgs e)
+        {
+            StartBtn.Enabled = false;
+            var type = TestsCombo.SelectedValue;
+            if (type != null)
+            {
+                await Start?.Invoke((Type)type);
+                StartBtn.Enabled = true;
+            }
         }
     }
 }

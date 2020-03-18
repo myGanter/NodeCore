@@ -3,6 +3,7 @@ using WinFormsTest.Core.IOC;
 using System.Windows.Forms;
 using Ninject;
 using WinFormsTest.Presenters;
+using WinFormsTest.Core.Services;
 
 namespace WinFormsTest
 {

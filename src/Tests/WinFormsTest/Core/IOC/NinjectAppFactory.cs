@@ -23,6 +23,7 @@ namespace WinFormsTest.Core.IOC
         public void Run<TPresenter, TArgumnent>(TArgumnent Argumnent) where TPresenter : class, IPresenter<TArgumnent>
         {
             var presenter = Kernel.Get<TPresenter>();
+            presenter.Run(Argumnent);
         }
     }
 }

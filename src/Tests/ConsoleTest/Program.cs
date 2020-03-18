@@ -19,14 +19,42 @@ namespace ConsoleTest
             PerformanceTest("first jit compilation", () => { FirstJitCompilation(s); });
             PerformanceTest("test1", Test1);
 
+            PerformanceTest("hash", () => { for (var i = 0; i < 100000; ++i) { var s = i.ToString().GetHashCode(); } });
+            PerformanceTest("hash2", () => { for (var i = 0; i < 100000; ++i) { var s = new Point3D(i, 3).GetHashCode(); } }, false);
+            Console.ReadKey();
+
             int n = 90;
-            PerformanceTest("TestCreateRectGraph", () => { TestCreateRectGraph(n); });
+            Console.Clear();
+            CheckGetHashCodePoint3D(n);
             Console.ReadKey();
+
+            PerformanceTest("TestCreateRectGraph", () => { TestCreateRectGraph(n); });            
             PerformanceTest("TestSearchPathRectGraph", (sw) => { TestSearchPathRectGraph(sw, n); }, false);
-            Console.ReadKey();
             PerformanceTest("TestSearchPathRectGraph", (sw) => { TestSearchPathRectGraph(sw, n); }, false);
 
             Console.ReadKey();
+        }
+
+        static void CheckGetHashCodePoint3D(int n) 
+        {
+            var hs = new HashSet<int>();
+            var res = 0;
+
+            for (var i = 0; i < n; ++i) 
+            {
+                for (var j = 0; j < n; ++j) 
+                {
+                    var p = new Point3D(j, i);
+                    var ph = p.GetHashCode();
+
+                    if (hs.Contains(ph))
+                        res++;
+                    else
+                        hs.Add(ph);
+                }
+            }
+
+            Console.WriteLine($"{res} | {n * n}");
         }
 
         static void TestSearchPathRectGraph(Stopwatch sw, int n) 
@@ -128,7 +156,6 @@ namespace ConsoleTest
                 Console.Clear();
 
             GC.Collect();
-            Thread.Sleep(300);
 
             var sw = new Stopwatch();
             sw.Start();
@@ -146,7 +173,6 @@ namespace ConsoleTest
                 Console.Clear();
 
             GC.Collect();
-            Thread.Sleep(300);
 
             var sw = new Stopwatch();
 

@@ -42,18 +42,18 @@ namespace NodeCore.Base
 
         public override bool Equals(object obj) => obj is Point3D p && Equals(p); 
 
-        public override int GetHashCode()//переопределить срочно, куча говна(коллизий)!!!!
+        public override int GetHashCode()
         {
             var hash = 17;
             hash = hash * 23 + X;
-            hash = hash * 23 + Y;
+            hash = hash * 23 * Y;
             hash = hash * 23 + Z;
-            return hash % 3 == 0 ? -hash : hash;
+            return X > Y ? hash : -hash;
 
             //return ToString().GetHashCode();
         }
 
-        public override string ToString() => $"{{X = {X} Y = {Y} Z = {Z}}}";
+        public override string ToString() => $"{{X={X} Y={Y} Z={Z}}}";
 
         public static Point3D operator +(Point3D P1, Point3D P2) => new Point3D(P1.X + P2.X, P1.Y + P2.Y, P1.Z + P2.Z);
 
