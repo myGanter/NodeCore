@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System;
+using WinFormsTest.Models;
 
 namespace WinFormsTest.Presenters
 {
@@ -19,10 +20,23 @@ namespace WinFormsTest.Presenters
             View.Start += View_Start;
         }
 
-        private Task View_Start(Type obj) => Task.Run(() =>
+        private Task View_Start(Type PType) => Task.Run(() =>
         {
-            Thread.Sleep(5000);
+            if (!FrameService.ContainsType(PType))
+                return;
+
+            var attr = new FrameElementArg();
+            attr.Log += Log;
+
+            Controller.Run<FrameElementArg>(PType, attr);
         });
+
+        private void Log(Type PType, string LogText) 
+        {
+            var attrInst = FrameService.GetFrameElementAttributeForType(PType);
+            LogText = $"{DateTime.Now:dd.MM.yyyy_hh:mm:ss} \"{attrInst.FrameName}\" =>{Environment.NewLine}{LogText}{Environment.NewLine}{Environment.NewLine}";
+            View.Log(LogText, attrInst.HeaderColor);
+        }
 
         public override void Run() 
         {

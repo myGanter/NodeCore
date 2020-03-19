@@ -27,6 +27,25 @@ namespace WinFormsTest.Views
             TestsCombo.ValueMember = "Item1";
         }
 
+        public void Log(string LogText, Color HColor)
+        {
+            Invoke(new Action(
+                () => 
+                {
+                    var headL = LogText.Split(Environment.NewLine)[0].Length;
+                    var pastL = LogVue.Text.Length;
+
+                    LogVue.AppendText(LogText);
+
+                    LogVue.Select(pastL, headL);
+                    LogVue.SelectionColor = HColor;
+                    LogVue.SelectionFont = new Font(LogVue.SelectionFont.Name, 10f, LogVue.SelectionFont.Style);
+
+                    LogVue.SelectionStart = LogVue.Text.Length;
+                    LogVue.ScrollToCaret();
+                }));            
+        }
+
         public new void Show()
         {
             Application.Run(this);

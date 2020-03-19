@@ -1,5 +1,6 @@
 ﻿using WinFormsTest.Core.Interfaces.IPresenters;
 using WinFormsTest.Core.Interfaces;
+using System;
 using Ninject;
 
 namespace WinFormsTest.Core.IOC
@@ -12,6 +13,28 @@ namespace WinFormsTest.Core.IOC
         {
             this.Kernel = Kernel;
             this.Kernel.Bind<IAppFactory>().ToMethod(c => this);
+        }
+
+        public void Run(Type PType) 
+        {
+            var opresenter = Kernel.Get(PType);
+            var tpresenter = opresenter as IPresenter;
+
+            if (tpresenter == null)
+                throw new Exception(PType.ToString() + " != IPresenter");
+
+            tpresenter.Run();
+        }
+
+        public void Run<TArgumnent>(Type PType, TArgumnent Argumnent)
+        {
+            var opresenter = Kernel.Get(PType);
+            var tpresenter = opresenter as IPresenter<TArgumnent>;
+
+            if (tpresenter == null)
+                throw new Exception(PType.ToString() + $" != IPresenter<{typeof(TArgumnent).ToString()}>");
+
+            tpresenter.Run(Argumnent);
         }
 
         public void Run<TPresenter>() where TPresenter : class, IPresenter

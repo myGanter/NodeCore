@@ -29,11 +29,11 @@
         private void InitializeComponent()
         {
             this.panel1 = new System.Windows.Forms.Panel();
-            this.panel2 = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.TestsCombo = new System.Windows.Forms.ComboBox();
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.StartBtn = new System.Windows.Forms.Button();
+            this.TestsCombo = new System.Windows.Forms.ComboBox();
+            this.label1 = new System.Windows.Forms.Label();
+            this.panel2 = new System.Windows.Forms.Panel();
+            this.LogVue = new System.Windows.Forms.RichTextBox();
             this.panel1.SuspendLayout();
             this.panel2.SuspendLayout();
             this.SuspendLayout();
@@ -52,19 +52,23 @@
             this.panel1.Size = new System.Drawing.Size(250, 407);
             this.panel1.TabIndex = 0;
             // 
-            // panel2
+            // StartBtn
             // 
-            this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel2.Controls.Add(this.richTextBox1);
-            this.panel2.Location = new System.Drawing.Point(270, 12);
-            this.panel2.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
-            this.panel2.Name = "panel2";
-            this.panel2.Padding = new System.Windows.Forms.Padding(5);
-            this.panel2.Size = new System.Drawing.Size(502, 407);
-            this.panel2.TabIndex = 1;
+            this.StartBtn.Location = new System.Drawing.Point(170, 47);
+            this.StartBtn.Name = "StartBtn";
+            this.StartBtn.Size = new System.Drawing.Size(75, 23);
+            this.StartBtn.TabIndex = 1;
+            this.StartBtn.Text = "Start";
+            this.StartBtn.UseVisualStyleBackColor = true;
+            // 
+            // TestsCombo
+            // 
+            this.TestsCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.TestsCombo.FormattingEnabled = true;
+            this.TestsCombo.Location = new System.Drawing.Point(2, 19);
+            this.TestsCombo.Name = "TestsCombo";
+            this.TestsCombo.Size = new System.Drawing.Size(243, 22);
+            this.TestsCombo.TabIndex = 0;
             // 
             // label1
             // 
@@ -76,35 +80,32 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Tests";
             // 
-            // TestsCombo
+            // panel2
             // 
-            this.TestsCombo.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.TestsCombo.FormattingEnabled = true;
-            this.TestsCombo.Location = new System.Drawing.Point(2, 19);
-            this.TestsCombo.Name = "TestsCombo";
-            this.TestsCombo.Size = new System.Drawing.Size(243, 22);
-            this.TestsCombo.TabIndex = 0;
-            // 
-            // richTextBox1
-            // 
-            this.richTextBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            this.panel2.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.richTextBox1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.richTextBox1.Location = new System.Drawing.Point(4, 2);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(493, 401);
-            this.richTextBox1.TabIndex = 0;
-            this.richTextBox1.Text = "";
+            this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2.Controls.Add(this.LogVue);
+            this.panel2.Location = new System.Drawing.Point(270, 12);
+            this.panel2.Margin = new System.Windows.Forms.Padding(4, 2, 4, 2);
+            this.panel2.Name = "panel2";
+            this.panel2.Padding = new System.Windows.Forms.Padding(5);
+            this.panel2.Size = new System.Drawing.Size(502, 407);
+            this.panel2.TabIndex = 1;
             // 
-            // StartBtn
+            // LogVue
             // 
-            this.StartBtn.Location = new System.Drawing.Point(170, 47);
-            this.StartBtn.Name = "StartBtn";
-            this.StartBtn.Size = new System.Drawing.Size(75, 23);
-            this.StartBtn.TabIndex = 1;
-            this.StartBtn.Text = "Start";
-            this.StartBtn.UseVisualStyleBackColor = true;
+            this.LogVue.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.LogVue.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.LogVue.Location = new System.Drawing.Point(4, 2);
+            this.LogVue.Name = "LogVue";
+            this.LogVue.ReadOnly = true;
+            this.LogVue.Size = new System.Drawing.Size(493, 401);
+            this.LogVue.TabIndex = 0;
+            this.LogVue.Text = "";
             // 
             // MainForm
             // 
@@ -131,7 +132,7 @@
         private System.Windows.Forms.Panel panel2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ComboBox TestsCombo;
-        private System.Windows.Forms.RichTextBox richTextBox1;
+        private System.Windows.Forms.RichTextBox LogVue;
         private System.Windows.Forms.Button StartBtn;
     }
 }
