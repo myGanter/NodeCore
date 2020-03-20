@@ -11,7 +11,11 @@ namespace WinFormsTest.Core.IOC
         public override void Load()
         {
             Bind<ImainForm>().To<MainForm>();
+            Bind<IMatrixForm>().To<MatrixTestForm>();
+
             Bind<MainPresenter>().To<MainPresenter>();
+            Bind<MatrixTestPresenter>().To<MatrixTestPresenter>();
+
             Bind<FrameElementService>().To<FrameElementService>();
         }
     }

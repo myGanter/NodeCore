@@ -6,18 +6,24 @@ using System.Threading.Tasks;
 using WinFormsTest.Models;
 using WinFormsTest.Core.Attributes;
 using WinFormsTest.Core.Interfaces.IPresenters;
+using WinFormsTest.Core.Interfaces;
 
 namespace WinFormsTest.Presenters
 {
     [FrameElement(168, 136, 56, "Test frame")]
     public class TestPresenter : IPresenter<FrameElementArg>
     {
+        public TestPresenter(IAppFactory Controller) { }
+
         public void Run(FrameElementArg Arg)
         {
-            var t = GetType();
+            Task.Run(() =>
+            {
+                var t = GetType();
 
-            for (var i = 0; i < 100; ++i)
-                Arg.LogInvoke(t, new string('w', 196) );
+                for (var i = 0; i < 100; ++i)
+                    Arg.LogInvoke(t, new string('w', 196));
+            });
         }
     }
 
@@ -26,10 +32,13 @@ namespace WinFormsTest.Presenters
     {
         public void Run(FrameElementArg Arg)
         {
-            var t = GetType();
+            Task.Run(() =>
+            {
+                var t = GetType();
 
-            for (var i = 0; i < 100; ++i)
-                Arg.LogInvoke(t, i.ToString());
+                for (var i = 0; i < 100; ++i)
+                    Arg.LogInvoke(t, i.ToString());
+            });
         }
     }
 
@@ -38,10 +47,13 @@ namespace WinFormsTest.Presenters
     {
         public void Run(FrameElementArg Arg)
         {
-            var t = GetType();
+            Task.Run(() =>
+            {
+                var t = GetType();
 
-            for (var i = 0; i < 100; ++i)
-                Arg.LogInvoke(t, i.ToString());
+                for (var i = 0; i < 100; ++i)
+                    Arg.LogInvoke(t, i.ToString());
+            });
         }
     }
 
@@ -50,10 +62,13 @@ namespace WinFormsTest.Presenters
     {
         public void Run(FrameElementArg Arg)
         {
-            var t = GetType();
+            Task.Run(() =>
+            {
+                var t = GetType();
 
-            for (var i = 0; i < 100; ++i)
-                Arg.LogInvoke(t, i.ToString());
+                for (var i = 0; i < 100; ++i)
+                    Arg.LogInvoke(t, i.ToString());
+            });
         }
     }
 
@@ -62,10 +77,13 @@ namespace WinFormsTest.Presenters
     {
         public void Run(FrameElementArg Arg)
         {
-            var t = GetType();
+            Task.Run(() =>
+            {
+                var t = GetType();
 
-            for (var i = 0; i < 100; ++i)
-                Arg.LogInvoke(t, i.ToString());
+                for (var i = 0; i < 100; ++i)
+                    Arg.LogInvoke(t, i.ToString());
+            });
         }
     }
 }

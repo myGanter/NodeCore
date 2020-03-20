@@ -12,6 +12,6 @@ namespace WinFormsTest.Core.Interfaces.IViews
 
         void Log(string LogText, Color HColor);
 
-        event Func<Type, Task> Start;
+        event Action<Type> Start;
     }
 }

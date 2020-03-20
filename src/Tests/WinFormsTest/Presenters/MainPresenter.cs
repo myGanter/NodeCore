@@ -20,7 +20,7 @@ namespace WinFormsTest.Presenters
             View.Start += View_Start;
         }
 
-        private Task View_Start(Type PType) => Task.Run(() =>
+        private void View_Start(Type PType) 
         {
             if (!FrameService.ContainsType(PType))
                 return;
@@ -29,12 +29,12 @@ namespace WinFormsTest.Presenters
             attr.Log += Log;
 
             Controller.Run<FrameElementArg>(PType, attr);
-        });
+        }
 
         private void Log(Type PType, string LogText) 
         {
             var attrInst = FrameService.GetFrameElementAttributeForType(PType);
-            LogText = $"{DateTime.Now:dd.MM.yyyy_hh:mm:ss} \"{attrInst.FrameName}\" =>{Environment.NewLine}{LogText}{Environment.NewLine}{Environment.NewLine}";
+            LogText = $"{DateTime.Now:dd.MM.yyyy_hh:mm:ss} \"{attrInst.FrameName}\">{Environment.NewLine}{LogText}{Environment.NewLine}{Environment.NewLine}";
             View.Log(LogText, attrInst.HeaderColor);
         }
 

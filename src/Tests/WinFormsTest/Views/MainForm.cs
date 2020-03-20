@@ -18,7 +18,7 @@ namespace WinFormsTest.Views
             StartBtn.Click += StartBtn_Click;
         }
 
-        public event Func<Type, Task> Start;
+        public event Action<Type> Start;
 
         public void BuildTests(List<Tuple<Type, string>> Data)
         {
@@ -51,13 +51,13 @@ namespace WinFormsTest.Views
             Application.Run(this);
         }
 
-        private async void StartBtn_Click(object sender, EventArgs e)
+        private void StartBtn_Click(object sender, EventArgs e)
         {
             StartBtn.Enabled = false;
             var type = TestsCombo.SelectedValue;
             if (type != null)
             {
-                await Start?.Invoke((Type)type);
+                Start?.Invoke((Type)type);
                 StartBtn.Enabled = true;
             }
         }
