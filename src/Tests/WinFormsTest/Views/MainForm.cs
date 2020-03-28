@@ -53,12 +53,10 @@ namespace WinFormsTest.Views
 
         private void StartBtn_Click(object sender, EventArgs e)
         {
-            StartBtn.Enabled = false;
             var type = TestsCombo.SelectedValue;
             if (type != null)
             {
                 Start?.Invoke((Type)type);
-                StartBtn.Enabled = true;
             }
         }
     }

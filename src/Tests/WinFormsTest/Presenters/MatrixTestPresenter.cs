@@ -6,6 +6,7 @@ using WinFormsTest.Core.Interfaces.IViews;
 using WinFormsTest.Core.Interfaces.IPresenters;
 using WinFormsTest.Models;
 using WinFormsTest.Core.Interfaces;
+using WinFormsTest.Core.Services;
 
 namespace WinFormsTest.Presenters
 {
@@ -14,14 +15,18 @@ namespace WinFormsTest.Presenters
     {
         private event Action<string> ExecLog;
 
-        public MatrixTestPresenter(IAppFactory Controller, IMatrixForm View) : base(Controller, View)
-        {
-            View.OnClose += View_OnClose;
-        }
+        private IMatrixFrameBrush MatrixFrameBrush { get; set; }
 
-        private void View_OnClose()
+        private readonly MatrixPaintService _MatrixPaintService;
+
+        public MatrixTestPresenter(IAppFactory Controller, IMatrixForm View, MatrixPaintService _MatrixPaintService) : base(Controller, View)
         {
-            ExecLog("Close form");
+            this._MatrixPaintService = _MatrixPaintService;
+
+            View.OnClose += View_OnClose;
+            View.OnStartBtn += View_Start;
+            View.OnReDraw += View_ReDraw;
+            View.OnPostShow += View_OnPostShow;
         }
 
         public override void Run(FrameElementArg Arg)
@@ -31,7 +36,44 @@ namespace WinFormsTest.Presenters
 
             ExecLog("Init form");
 
+            MatrixFrameBrush = View.GetMatrixFrameDrawing();
+            _MatrixPaintService.BindBrush(MatrixFrameBrush);
+
             View.Show();
+        }
+
+        private void View_OnClose()
+        {
+            ExecLog("Close form");
+        }
+
+        private void View_OnPostShow()
+        {
+            MatrixFrameBrush.Clear(System.Drawing.Color.FromArgb(255, 62, 62, 64));
+            MatrixFrameBrush.DrawBoof();
+        }
+
+        private void View_ReDraw()
+        {
+            if (_MatrixPaintService.SizeInit)
+            {
+                MatrixFrameBrush.Clear(System.Drawing.Color.Red);
+                MatrixFrameBrush.DrawBoof();
+            }
+            else
+            {
+                View_OnPostShow();
+            }
+        }
+
+        private void View_Start(uint Size)
+        {
+            ExecLog($"Init convas... Matrix size: {Size}");
+
+            _MatrixPaintService.Init(Size);
+
+            MatrixFrameBrush.Clear(System.Drawing.Color.AliceBlue);
+            MatrixFrameBrush.DrawBoof();
         }
     }
 }

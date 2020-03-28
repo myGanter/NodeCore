@@ -7,5 +7,13 @@ namespace WinFormsTest.Core.Interfaces.IViews
     public interface IMatrixForm : IView
     {
         event Action OnClose;
+
+        event Action<uint> OnStartBtn;
+
+        event Action OnReDraw;
+
+        event Action OnPostShow;
+
+        IMatrixFrameBrush GetMatrixFrameDrawing();
     }
 }
