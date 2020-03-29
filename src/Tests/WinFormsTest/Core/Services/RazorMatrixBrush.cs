@@ -20,6 +20,20 @@ namespace WinFormsTest.Core.Services
         {
             this.PB = PB;
         }
+        public Size GetConvasSize()
+        {
+            return PB.Size;
+        }
+
+        public void DrawImage(Image Image, int X, int Y, int Width, int Height)
+        {
+            PB.RazorGFX.DrawImage(Image, X, Y, Width, Height);
+        }
+
+        public void DrawImage(Image Image, int X, int Y)
+        {
+            PB.RazorGFX.DrawImage(Image, X, Y);
+        }
 
         public void Clear(Color Col)
         {

@@ -57,8 +57,7 @@ namespace WinFormsTest.Presenters
         {
             if (_MatrixPaintService.SizeInit)
             {
-                MatrixFrameBrush.Clear(System.Drawing.Color.Red);
-                MatrixFrameBrush.DrawBoof();
+                _MatrixPaintService.DrawFrame();
             }
             else
             {
@@ -71,9 +70,6 @@ namespace WinFormsTest.Presenters
             ExecLog($"Init convas... Matrix size: {Size}");
 
             _MatrixPaintService.Init(Size);
-
-            MatrixFrameBrush.Clear(System.Drawing.Color.AliceBlue);
-            MatrixFrameBrush.DrawBoof();
         }
     }
 }

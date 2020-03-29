@@ -10,4 +10,13 @@
     <PackageReference Include="Ninject" Version="3.3.4" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="Textures\gross.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Textures\wall.jpg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

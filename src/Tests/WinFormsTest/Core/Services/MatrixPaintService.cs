@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Drawing;
+using System.IO;
 using WinFormsTest.Core.Interfaces;
+using WinFormsTest.Models;
 
 namespace WinFormsTest.Core.Services
 {
@@ -13,6 +16,13 @@ namespace WinFormsTest.Core.Services
 
         private IMatrixFrameBrush MatrixFrameBrush { get; set; }
 
+        private Bitmap WallTexture { get; set; }
+        private Bitmap GrassTexture { get; set; }
+        private Bitmap StartTexture { get; set; }
+        private Bitmap FinishTexture { get; set; }
+
+        private ObjType[,] Map { get; set; }
+
         public void BindBrush(IMatrixFrameBrush MatrixFrameBrush) 
         {
             this.MatrixFrameBrush = MatrixFrameBrush;
@@ -21,6 +31,81 @@ namespace WinFormsTest.Core.Services
         public void Init(uint MatrixSize) 
         {
             this.MatrixSize = MatrixSize;
+            InitTextures();
+            InitMap();
+            DrawFrame();
+        }
+
+        public void DrawFrame() 
+        {
+            var mSizeValue = (int)MatrixSize.Value;
+            var convasSize = MatrixFrameBrush.GetConvasSize();
+            var cellW = convasSize.Width / mSizeValue;
+            var cellH = convasSize.Height / mSizeValue;
+
+            if (cellW == 0 || cellH == 0)
+                return;
+
+            var newGrassT = new Bitmap(GrassTexture, cellW, cellH);
+            var newWallT = new Bitmap(WallTexture, cellW, cellH);
+
+            MatrixFrameBrush.Clear(Color.FromArgb(255, 62, 62, 64));
+
+            for (var y = 0; y < mSizeValue; ++y) 
+            {
+                var cy = y * cellH;
+
+                for (var x = 0; x < mSizeValue; ++x) 
+                {
+                    var cx = x * cellW;                                      
+
+                    switch (Map[y, x]) 
+                    {
+                        case ObjType.Grass:
+                            MatrixFrameBrush.DrawImage(newGrassT, cx, cy);
+                            break;
+                        case ObjType.Wall:
+                            MatrixFrameBrush.DrawImage(newWallT, cx, cy);
+                            break;
+                    }
+                }
+            }
+
+            newGrassT.Dispose();
+            newWallT.Dispose();
+
+            MatrixFrameBrush.DrawBoof();
+        }
+
+        private void InitTextures() 
+        {
+            if (WallTexture != null)
+                WallTexture.Dispose();
+            if (GrassTexture != null)
+                GrassTexture.Dispose();
+            if (StartTexture != null)
+                StartTexture.Dispose();
+            if (FinishTexture != null)
+                FinishTexture.Dispose();
+
+            WallTexture = new Bitmap(@"Textures\wall.jpg");
+            GrassTexture = new Bitmap(@"Textures\gross.jpg");
+
+            StartTexture = new Bitmap(50, 50);
+            var g = Graphics.FromImage(StartTexture);
+            g.Clear(Color.Red);
+            g.Dispose();
+
+            FinishTexture = new Bitmap(50, 50);
+            g = Graphics.FromImage(FinishTexture);
+            g.Clear(Color.Black);
+            g.Dispose();
+        }
+
+        private void InitMap() 
+        {
+            var l = (int)MatrixSize;
+            Map = new ObjType[l, l];
         }
     }
 }
