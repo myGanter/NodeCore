@@ -7,6 +7,7 @@ using WinFormsTest.Core.Interfaces.IPresenters;
 using WinFormsTest.Models;
 using WinFormsTest.Core.Interfaces;
 using WinFormsTest.Core.Services;
+using System.Drawing;
 
 namespace WinFormsTest.Presenters
 {
@@ -27,6 +28,7 @@ namespace WinFormsTest.Presenters
             View.OnStartBtn += View_Start;
             View.OnReDraw += View_ReDraw;
             View.OnPostShow += View_OnPostShow;
+            View.OnCanvasClick += View_OnCanvasClick;
         }
 
         public override void Run(FrameElementArg Arg)
@@ -40,6 +42,17 @@ namespace WinFormsTest.Presenters
             _MatrixPaintService.BindBrush(MatrixFrameBrush);
 
             View.Show();
+        }
+
+        private void View_OnCanvasClick(ObjTypeV Obj, Point P)
+        {
+            if (!_MatrixPaintService.SizeInit)
+                return;
+
+            if (Obj == ObjTypeV.Grass || Obj == ObjTypeV.Wall) 
+            {
+                _MatrixPaintService.DrawObj((ObjType)Obj, P);
+            }
         }
 
         private void View_OnClose()
@@ -67,7 +80,7 @@ namespace WinFormsTest.Presenters
 
         private void View_Start(uint Size)
         {
-            ExecLog($"Init convas... Matrix size: {Size}");
+            ExecLog($"Init canvas... Matrix size: {Size}");
 
             _MatrixPaintService.Init(Size);
         }

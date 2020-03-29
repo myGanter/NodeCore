@@ -4,7 +4,6 @@ using System.Text;
 using System.Drawing;
 using System.IO;
 using WinFormsTest.Core.Interfaces;
-using WinFormsTest.Models;
 
 namespace WinFormsTest.Core.Services
 {
@@ -36,12 +35,52 @@ namespace WinFormsTest.Core.Services
             DrawFrame();
         }
 
+        public void DrawObj(ObjType Obj, Point P) 
+        {
+            var mSizeValue = (int)MatrixSize.Value;
+            var canvasSize = MatrixFrameBrush.GetCanvasSize();
+            var cellW = canvasSize.Width / mSizeValue;
+            var cellH = canvasSize.Height / mSizeValue;
+
+            if (cellW == 0 || cellH == 0)
+                return;
+
+            var cx = P.X / cellW;
+            var cy = P.Y / cellH;
+
+            if (cx > (MatrixSize - 1) || cy > (MatrixSize - 1) || cx < 0 || cy < 0)
+                return;
+
+            var newGrassT = new Bitmap(GrassTexture, cellW, cellH);
+            var newWallT = new Bitmap(WallTexture, cellW, cellH);            
+
+            Map[cy, cx] = Obj;
+
+            cx *= cellW;
+            cy *= cellH;
+
+            switch (Obj)
+            {
+                case ObjType.Grass:
+                    MatrixFrameBrush.DrawImage(newGrassT, cx, cy);
+                    break;
+                case ObjType.Wall:
+                    MatrixFrameBrush.DrawImage(newWallT, cx, cy);
+                    break;
+            }
+
+            newGrassT.Dispose();
+            newWallT.Dispose();
+
+            MatrixFrameBrush.DrawBoof();
+        }
+
         public void DrawFrame() 
         {
             var mSizeValue = (int)MatrixSize.Value;
-            var convasSize = MatrixFrameBrush.GetConvasSize();
-            var cellW = convasSize.Width / mSizeValue;
-            var cellH = convasSize.Height / mSizeValue;
+            var canvasSize = MatrixFrameBrush.GetCanvasSize();
+            var cellW = canvasSize.Width / mSizeValue;
+            var cellH = canvasSize.Height / mSizeValue;
 
             if (cellW == 0 || cellH == 0)
                 return;
@@ -107,5 +146,11 @@ namespace WinFormsTest.Core.Services
             var l = (int)MatrixSize;
             Map = new ObjType[l, l];
         }
+    }
+
+    public enum ObjType
+    {
+        Grass,
+        Wall
     }
 }

@@ -7,7 +7,7 @@ namespace WinFormsTest.Core.Interfaces
 {
     public interface IMatrixFrameBrush
     {
-        Size GetConvasSize();
+        Size GetCanvasSize();
 
         void DrawImage(Image Image, int X, int Y);
 

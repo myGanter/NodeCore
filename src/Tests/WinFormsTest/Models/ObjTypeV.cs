@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 
 namespace WinFormsTest.Models
-{    public enum ObjType
+{    
+    public enum ObjTypeV
     {
         Grass,
         Wall

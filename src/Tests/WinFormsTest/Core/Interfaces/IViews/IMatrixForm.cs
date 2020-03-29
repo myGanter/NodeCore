@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Drawing;
+using WinFormsTest.Models;
 
 namespace WinFormsTest.Core.Interfaces.IViews
 {
@@ -13,6 +15,8 @@ namespace WinFormsTest.Core.Interfaces.IViews
         event Action OnReDraw;
 
         event Action OnPostShow;
+
+        event Action<ObjTypeV, Point> OnCanvasClick;
 
         IMatrixFrameBrush GetMatrixFrameDrawing();
     }

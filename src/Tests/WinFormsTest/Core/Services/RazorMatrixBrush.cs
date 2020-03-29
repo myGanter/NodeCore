@@ -20,7 +20,7 @@ namespace WinFormsTest.Core.Services
         {
             this.PB = PB;
         }
-        public Size GetConvasSize()
+        public Size GetCanvasSize()
         {
             return PB.Size;
         }

@@ -33,6 +33,7 @@
             this.StartBtn = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.ObjBox = new System.Windows.Forms.ComboBox();
             this.Canvas = new RazorGDIControlWF.RazorPainterWFCtl();
             ((System.ComponentModel.ISupportInitialize)(this.SizePicker)).BeginInit();
             this.panel1.SuspendLayout();
@@ -88,6 +89,7 @@
             this.panel1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.panel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel1.Controls.Add(this.ObjBox);
             this.panel1.Controls.Add(this.StartBtn);
             this.panel1.Controls.Add(this.SizePicker);
             this.panel1.Controls.Add(this.label1);
@@ -108,15 +110,25 @@
             this.panel2.Location = new System.Drawing.Point(93, 10);
             this.panel2.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.panel2.Name = "panel2";
-            this.panel2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel2.Padding = new System.Windows.Forms.Padding(4);
             this.panel2.Size = new System.Drawing.Size(587, 377);
             this.panel2.TabIndex = 1;
+            // 
+            // ObjBox
+            // 
+            this.ObjBox.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ObjBox.FormattingEnabled = true;
+            this.ObjBox.Location = new System.Drawing.Point(2, 75);
+            this.ObjBox.Name = "ObjBox";
+            this.ObjBox.Size = new System.Drawing.Size(69, 21);
+            this.ObjBox.TabIndex = 2;
             // 
             // Canvas
             // 
             this.Canvas.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.Canvas.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Canvas.Location = new System.Drawing.Point(4, 4);
+            this.Canvas.MinimumSize = new System.Drawing.Size(1, 1);
             this.Canvas.Name = "Canvas";
             this.Canvas.Size = new System.Drawing.Size(577, 367);
             this.Canvas.TabIndex = 0;
@@ -147,5 +159,6 @@
         private System.Windows.Forms.Panel panel1;
         private System.Windows.Forms.Panel panel2;
         private RazorGDIControlWF.RazorPainterWFCtl Canvas;
+        private System.Windows.Forms.ComboBox ObjBox;
     }
 }
