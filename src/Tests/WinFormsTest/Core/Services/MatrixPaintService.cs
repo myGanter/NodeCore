@@ -16,11 +16,26 @@ namespace WinFormsTest.Core.Services
         private IMatrixFrameBrush MatrixFrameBrush { get; set; }
 
         private Bitmap WallTexture { get; set; }
+        private Bitmap ConvertWallTexture { get; set; }
+
         private Bitmap GrassTexture { get; set; }
+        private Bitmap ConvertGrassTexture { get; set; }
+
         private Bitmap StartTexture { get; set; }
+        private Bitmap ConvertStartTexture { get; set; }
+
         private Bitmap FinishTexture { get; set; }
+        private Bitmap ConvertFinishTexture { get; set; }
 
         private ObjType[,] Map { get; set; }
+
+        private int CellH { get; set; }
+
+        private int CellW { get; set; }
+
+        private Point StartIndex { get; set; }
+
+        private Point FinishIndex { get; set; }
 
         public void BindBrush(IMatrixFrameBrush MatrixFrameBrush) 
         {
@@ -30,90 +45,119 @@ namespace WinFormsTest.Core.Services
         public void Init(uint MatrixSize) 
         {
             this.MatrixSize = MatrixSize;
+
+            StartIndex = new Point();
+            var finishindex = (int)(MatrixSize - 1);
+            FinishIndex = new Point(finishindex, finishindex);
+
             InitTextures();
             InitMap();
-            DrawFrame();
+            DrawFrame();            
         }
 
         public void DrawObj(ObjType Obj, Point P) 
         {
-            var mSizeValue = (int)MatrixSize.Value;
-            var canvasSize = MatrixFrameBrush.GetCanvasSize();
-            var cellW = canvasSize.Width / mSizeValue;
-            var cellH = canvasSize.Height / mSizeValue;
-
-            if (cellW == 0 || cellH == 0)
-                return;
-
-            var cx = P.X / cellW;
-            var cy = P.Y / cellH;
+            var cx = P.X / CellW;
+            var cy = P.Y / CellH;
 
             if (cx > (MatrixSize - 1) || cy > (MatrixSize - 1) || cx < 0 || cy < 0)
-                return;
-
-            var newGrassT = new Bitmap(GrassTexture, cellW, cellH);
-            var newWallT = new Bitmap(WallTexture, cellW, cellH);            
+                return;       
 
             Map[cy, cx] = Obj;
 
-            cx *= cellW;
-            cy *= cellH;
-
-            switch (Obj)
+            var chIndex = new Point(cx, cy);
+            if (chIndex == StartIndex || chIndex == FinishIndex)
             {
-                case ObjType.Grass:
-                    MatrixFrameBrush.DrawImage(newGrassT, cx, cy);
-                    break;
-                case ObjType.Wall:
-                    MatrixFrameBrush.DrawImage(newWallT, cx, cy);
-                    break;
+                RedrawMap();
             }
+            else
+            {
+                cx *= CellW;
+                cy *= CellH;
 
-            newGrassT.Dispose();
-            newWallT.Dispose();
+                DrawObj(Obj, cx, cy);
 
-            MatrixFrameBrush.DrawBoof();
+                MatrixFrameBrush.DrawBoof();
+            }
+        }
+
+        public void DrawStart(Point P) 
+        {
+            var cx = P.X / CellW;
+            var cy = P.Y / CellH;
+            var si = new Point(cx, cy);
+
+            if (cx > (MatrixSize - 1) || cy > (MatrixSize - 1) || cx < 0 || cy < 0 || si == FinishIndex)
+                return;
+
+            StartIndex = si;
+
+            RedrawMap();
+        }
+
+        public void DrawFinish(Point P)
+        {
+            var cx = P.X / CellW;
+            var cy = P.Y / CellH;
+            var si = new Point(cx, cy);
+
+            if (cx > (MatrixSize - 1) || cy > (MatrixSize - 1) || cx < 0 || cy < 0 || si == StartIndex)
+                return;
+
+            FinishIndex = si;
+
+            RedrawMap();
         }
 
         public void DrawFrame() 
         {
-            var mSizeValue = (int)MatrixSize.Value;
-            var canvasSize = MatrixFrameBrush.GetCanvasSize();
-            var cellW = canvasSize.Width / mSizeValue;
-            var cellH = canvasSize.Height / mSizeValue;
-
-            if (cellW == 0 || cellH == 0)
+            if (!InitConvertTextures())
                 return;
 
-            var newGrassT = new Bitmap(GrassTexture, cellW, cellH);
-            var newWallT = new Bitmap(WallTexture, cellW, cellH);
+            RedrawMap();            
+        }
+
+        private void RedrawMap() 
+        {
+            var mSizeValue = (int)MatrixSize.Value;
 
             MatrixFrameBrush.Clear(Color.FromArgb(255, 62, 62, 64));
 
-            for (var y = 0; y < mSizeValue; ++y) 
+            for (var y = 0; y < mSizeValue; ++y)
             {
-                var cy = y * cellH;
+                var cy = y * CellH;
 
-                for (var x = 0; x < mSizeValue; ++x) 
+                for (var x = 0; x < mSizeValue; ++x)
                 {
-                    var cx = x * cellW;                                      
+                    var cx = x * CellW;
 
-                    switch (Map[y, x]) 
-                    {
-                        case ObjType.Grass:
-                            MatrixFrameBrush.DrawImage(newGrassT, cx, cy);
-                            break;
-                        case ObjType.Wall:
-                            MatrixFrameBrush.DrawImage(newWallT, cx, cy);
-                            break;
-                    }
+                    DrawObj(Map[y, x], cx, cy);
                 }
             }
 
-            newGrassT.Dispose();
-            newWallT.Dispose();
+            var div4W = (int)Math.Ceiling((CellW - CellW / 1.2f) / 2);
+            var div4H = (int)Math.Ceiling((CellH - CellH / 1.2f) / 2);
+
+            var finishI = FinishIndex;
+            MatrixFrameBrush.DrawImage(ConvertFinishTexture, finishI.X * CellW + div4W, finishI.Y * CellH + div4H);
+
+            var startI = StartIndex;
+            MatrixFrameBrush.DrawImage(ConvertStartTexture, startI.X * CellW + div4W, startI.Y * CellH + div4H);
 
             MatrixFrameBrush.DrawBoof();
+        }
+
+        private void DrawObj(ObjType Obj, int X, int Y) 
+        {
+            switch (Obj)
+            {
+                case ObjType.Grass:
+                    MatrixFrameBrush.DrawImage(ConvertGrassTexture, X, Y);
+                    break;
+                case ObjType.Wall:
+                    MatrixFrameBrush.DrawImage(ConvertWallTexture, X, Y);
+                    break;
+            }
         }
 
         private void InitTextures() 
@@ -129,16 +173,38 @@ namespace WinFormsTest.Core.Services
 
             WallTexture = new Bitmap(@"Textures\wall.jpg");
             GrassTexture = new Bitmap(@"Textures\gross.jpg");
+            StartTexture = new Bitmap(@"Textures\start.jpg");
+            FinishTexture = new Bitmap(@"Textures\finish.jpg");
+        }
 
-            StartTexture = new Bitmap(50, 50);
-            var g = Graphics.FromImage(StartTexture);
-            g.Clear(Color.Red);
-            g.Dispose();
+        private bool InitConvertTextures() 
+        {
+            if (ConvertWallTexture != null)
+                ConvertWallTexture.Dispose();
+            if (ConvertGrassTexture != null)
+                ConvertGrassTexture.Dispose();
+            if (ConvertStartTexture != null)
+                ConvertStartTexture.Dispose();
+            if (ConvertFinishTexture != null)
+                ConvertFinishTexture.Dispose();
 
-            FinishTexture = new Bitmap(50, 50);
-            g = Graphics.FromImage(FinishTexture);
-            g.Clear(Color.Black);
-            g.Dispose();
+            var mSizeValue = (int)MatrixSize.Value;
+            var canvasSize = MatrixFrameBrush.GetCanvasSize();
+            CellW = canvasSize.Width / mSizeValue;
+            CellH = canvasSize.Height / mSizeValue;
+
+            if (CellW == 0 || CellH == 0)
+                return false;
+
+            ConvertGrassTexture = new Bitmap(GrassTexture, CellW, CellH);
+            ConvertWallTexture = new Bitmap(WallTexture, CellW, CellH);
+
+            var div2W = (int)Math.Ceiling(CellW / 1.2f);
+            var div2H = (int)Math.Ceiling(CellH / 1.2f);
+            ConvertStartTexture = new Bitmap(StartTexture, div2W, div2H);
+            ConvertFinishTexture = new Bitmap(FinishTexture, div2W, div2H);
+
+            return true;
         }
 
         private void InitMap() 

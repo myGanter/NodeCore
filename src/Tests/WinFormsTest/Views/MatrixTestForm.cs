@@ -53,6 +53,8 @@ namespace WinFormsTest.Views
         {
             ObjBox.Items.Add(ObjTypeV.Grass);
             ObjBox.Items.Add(ObjTypeV.Wall);
+            ObjBox.Items.Add(ObjTypeV.Start);
+            ObjBox.Items.Add(ObjTypeV.Finish);
 
             ObjBox.SelectedIndex = 1;
         }

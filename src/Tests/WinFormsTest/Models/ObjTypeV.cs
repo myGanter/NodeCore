@@ -7,6 +7,8 @@ namespace WinFormsTest.Models
     public enum ObjTypeV
     {
         Grass,
-        Wall
+        Wall,
+        Start,
+        Finish
     }
 }

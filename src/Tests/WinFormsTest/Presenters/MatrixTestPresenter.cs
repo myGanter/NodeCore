@@ -49,10 +49,19 @@ namespace WinFormsTest.Presenters
             if (!_MatrixPaintService.SizeInit)
                 return;
 
-            if (Obj == ObjTypeV.Grass || Obj == ObjTypeV.Wall) 
+            switch (Obj)
             {
-                _MatrixPaintService.DrawObj((ObjType)Obj, P);
-            }
+                case ObjTypeV.Grass:
+                case ObjTypeV.Wall:
+                    _MatrixPaintService.DrawObj((ObjType)Obj, P);
+                    break;
+                case ObjTypeV.Start:
+                    _MatrixPaintService.DrawStart(P);
+                    break;
+                case ObjTypeV.Finish:
+                    _MatrixPaintService.DrawFinish(P);
+                    break;
+            }            
         }
 
         private void View_OnClose()
