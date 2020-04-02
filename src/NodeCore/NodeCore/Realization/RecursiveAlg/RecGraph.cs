@@ -37,7 +37,7 @@ namespace NodeCore.Realization.RecursiveAlg
 
         public bool NodeExist(INode<T> Node) => NodeExist(Node.Name);
 
-        public bool NodeExist(string NodeName) => Nodes.ContainsKey(Name);
+        public bool NodeExist(string NodeName) => Nodes.ContainsKey(NodeName);
 
         public bool NodeExist(Point3D NodePoint) => Nodes.ContainsKey(NodePoint.ToString());
 

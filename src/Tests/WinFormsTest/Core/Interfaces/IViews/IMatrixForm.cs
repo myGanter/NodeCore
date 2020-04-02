@@ -18,6 +18,12 @@ namespace WinFormsTest.Core.Interfaces.IViews
 
         event Action<ObjTypeV, Point> OnCanvasClick;
 
+        event Action<ObjTypeV> OnFill;
+
+        event Action<string> OnSearch;
+
         IMatrixFrameBrush GetMatrixFrameDrawing();
+
+        void BuildGrapbBox(List<string> Objs);
     }
 }

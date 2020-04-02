@@ -11,6 +11,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\NodeCore\NodeCore\NodeCore.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Textures\finish.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

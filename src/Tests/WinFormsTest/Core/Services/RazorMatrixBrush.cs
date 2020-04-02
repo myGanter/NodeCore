@@ -35,6 +35,11 @@ namespace WinFormsTest.Core.Services
             PB.RazorGFX.DrawImage(Image, X, Y);
         }
 
+        public void FillRectangle(Color Col, int X, int Y, int W, int H) 
+        {
+            PB.RazorGFX.FillRectangle(new SolidBrush(Col), X, Y, W, H);
+        }
+
         public void Clear(Color Col)
         {
             PB.RazorGFX.Clear(Col);

@@ -13,6 +13,8 @@ namespace WinFormsTest.Core.Interfaces
 
         void DrawImage(Image Image, int X, int Y, int Width, int Height);
 
+        void FillRectangle(Color Col, int X, int Y, int W, int H);
+
         void Clear(Color Col);
 
         void DrawBoof();

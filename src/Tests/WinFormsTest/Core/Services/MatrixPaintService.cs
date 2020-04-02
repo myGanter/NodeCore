@@ -13,6 +13,12 @@ namespace WinFormsTest.Core.Services
 
         public bool SizeInit { get => MatrixSize != null; }
 
+        public ObjType[,] Map { get; private set; }
+
+        public Point StartIndex { get; private set; }
+
+        public Point FinishIndex { get; private set; }
+
         private IMatrixFrameBrush MatrixFrameBrush { get; set; }
 
         private Bitmap WallTexture { get; set; }
@@ -27,15 +33,11 @@ namespace WinFormsTest.Core.Services
         private Bitmap FinishTexture { get; set; }
         private Bitmap ConvertFinishTexture { get; set; }
 
-        private ObjType[,] Map { get; set; }
-
         private int CellH { get; set; }
 
         private int CellW { get; set; }
 
-        private Point StartIndex { get; set; }
-
-        private Point FinishIndex { get; set; }
+        private List<Point> Puth { get; set; }
 
         public void BindBrush(IMatrixFrameBrush MatrixFrameBrush) 
         {
@@ -44,6 +46,7 @@ namespace WinFormsTest.Core.Services
 
         public void Init(uint MatrixSize) 
         {
+            Puth = null;
             this.MatrixSize = MatrixSize;
 
             StartIndex = new Point();
@@ -53,6 +56,26 @@ namespace WinFormsTest.Core.Services
             InitTextures();
             InitMap();
             DrawFrame();            
+        }
+
+        public void SetPuth(List<Point> Puth) 
+        {
+            this.Puth = Puth;
+
+            RedrawMap();
+        }
+
+        public void Fill(ObjType Obj) 
+        {
+            for (var y = 0; y < Map.GetLength(0); ++y)
+            {
+                for (var x = 0; x < Map.GetLength(1); ++x) 
+                {
+                    Map[y, x] = Obj;
+                }
+            }
+
+            RedrawMap();
         }
 
         public void DrawObj(ObjType Obj, Point P) 
@@ -143,6 +166,17 @@ namespace WinFormsTest.Core.Services
 
             var startI = StartIndex;
             MatrixFrameBrush.DrawImage(ConvertStartTexture, startI.X * CellW + div4W, startI.Y * CellH + div4H);
+
+            if (Puth != null) 
+            {
+                for (var i = 0; i < Puth.Count; ++i) 
+                {
+                    var cx = Puth[i].X * CellW;
+                    var cy = Puth[i].Y * CellH;
+
+                    MatrixFrameBrush.FillRectangle(Color.FromArgb(150, Color.Aqua), cx, cy, CellW, CellH);
+                }
+            }
 
             MatrixFrameBrush.DrawBoof();
         }

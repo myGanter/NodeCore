@@ -19,6 +19,8 @@ namespace WinFormsTest.Views
         public event Action OnReDraw;
         public event Action OnPostShow;
         public event Action<ObjTypeV, Point> OnCanvasClick;
+        public event Action<ObjTypeV> OnFill;
+        public event Action<string> OnSearch;
 
         private readonly RazorMatrixBrush _PicBoxPainter;
 
@@ -26,9 +28,11 @@ namespace WinFormsTest.Views
         {
             InitializeComponent();
             InitObjBoxValues();
+            ToolPanel.Visible = false;
 
             Shown += MatrixTestForm_Shown;
             FormClosing += MatrixTestForm_FormClosing;
+            SearchBtn.Click += SearchBtn_Click; FillBtn.Click += FillBtn_Click;
 
             _PicBoxPainter = PicBoxPainter;
             _PicBoxPainter.BindPicBox(Canvas);
@@ -49,6 +53,11 @@ namespace WinFormsTest.Views
             return _PicBoxPainter;
         }
 
+        public void BuildGrapbBox(List<string> Objs) 
+        {
+            GraphBox.DataSource = Objs;
+        }
+
         private void InitObjBoxValues()
         {
             ObjBox.Items.Add(ObjTypeV.Grass);
@@ -59,13 +68,23 @@ namespace WinFormsTest.Views
             ObjBox.SelectedIndex = 1;
         }
 
+        private bool GetObjType(out ObjTypeV ObjType) 
+        {
+            ObjType = default;
+
+            if (ObjBox.SelectedItem == null)
+                return false;
+
+            ObjType = (ObjTypeV)ObjBox.SelectedItem;
+            return true;
+        }
+
         private void Canvas_MouseDown(object sender, MouseEventArgs e)
         {
-            if (ObjBox.SelectedItem == null)
-                return;
-
-            var selectedObj = (ObjTypeV)ObjBox.SelectedItem;
-            OnCanvasClick?.Invoke(selectedObj, e.Location);
+            if (GetObjType(out ObjTypeV selectedObj)) 
+            {
+                OnCanvasClick?.Invoke(selectedObj, e.Location);
+            }            
         }
 
         private void Canvas_MouseMove(object sender, MouseEventArgs e)
@@ -94,6 +113,25 @@ namespace WinFormsTest.Views
         {
             var value = (uint)SizePicker.Value;
             OnStartBtn?.Invoke(value);
+            ToolPanel.Visible = true;
+        }
+
+        private void FillBtn_Click(object sender, EventArgs e)
+        {
+            if (GetObjType(out ObjTypeV selectedObj))
+            {
+                OnFill?.Invoke(selectedObj);
+            }
+        }
+
+        private void SearchBtn_Click(object sender, EventArgs e)
+        {
+            if (GraphBox.SelectedItem == null)
+                return;
+
+            var methodName = (string)GraphBox.SelectedItem;
+
+            OnSearch?.Invoke(methodName);
         }
     }
 }
