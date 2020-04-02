@@ -15,7 +15,7 @@ namespace ConsoleTest
 
         static void Main(string[] args)
         {
-            var s = Zavod.Get2<string>("1");
+            var s = GraphFactory.CreateDijkstraGraph<string>("1");
             PerformanceTest("first jit compilation", () => { FirstJitCompilation(s); });
             PerformanceTest("test1", Test1);
 
@@ -67,7 +67,7 @@ namespace ConsoleTest
 
         static void TestCreateRectGraph(int n) 
         {
-            StaticGraph = Zavod.Get2<string>("rect");
+            StaticGraph = GraphFactory.CreateDijkstraGraph<string>("rect");
             var rn = StaticGraph.AddNode("root");
             //StaticGraph.AddNode("test", new Point3D(n + 30, n + 30));
 
@@ -108,7 +108,7 @@ namespace ConsoleTest
 
         static void Test1() 
         {
-            var s = Zavod.Get3<string>("2");
+            var s = GraphFactory.CreateAStarGraph<string>("2");
             var tn = s.AddNode(null);
             tn.AddNodeDD(null, 1, new Point3D(1));
             tn.AddNodeDD(null, 1, new Point3D(0, 1));
