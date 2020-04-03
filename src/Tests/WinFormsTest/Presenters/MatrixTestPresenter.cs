@@ -9,6 +9,7 @@ using WinFormsTest.Models;
 using WinFormsTest.Core.Interfaces;
 using WinFormsTest.Core.Services;
 using System.Drawing;
+using System.Diagnostics;
 using NodeCore.Base;
 
 namespace WinFormsTest.Presenters
@@ -56,12 +57,15 @@ namespace WinFormsTest.Presenters
 
         private void View_OnSearch(string MethodName)
         {
-            //TODO логи
+            var sw = new Stopwatch();
 
             var map = _MatrixPaintService.Map;
             var graph = _GraphService.CreateGraph(MethodName);
             var mapSize = _MatrixPaintService.MatrixSize.Value;
 
+            GC.Collect();
+            #region init graph
+            sw.Start();
             for (var y = 0; y < mapSize; ++y) 
             {
                 for (var x = 0; x < mapSize; ++x) 
@@ -83,14 +87,48 @@ namespace WinFormsTest.Presenters
                         node.AddNodeDD((g, n) => g[pastP]);
                     }
                 }
-            }
+            }            
+            sw.Stop();
+            #endregion init graph
 
+            var initTimeMs = sw.ElapsedMilliseconds;
+            sw.Reset();
 
             var nodeProc = graph.CreateNodeProcessor();
             var startN = graph[new Point3D(_MatrixPaintService.StartIndex)];
             var finishN = graph[new Point3D(_MatrixPaintService.FinishIndex)];
 
+            GC.Collect();
+            #region search puth
+            sw.Start();
             var puth = nodeProc.SearchPath(startN, finishN);
+            sw.Stop();
+            #endregion search puth
+
+            var searchTimeMS = sw.ElapsedMilliseconds;
+
+            var wallCoount = 0;
+            for (var y = 0; y < mapSize; ++y)
+            {
+                for (var x = 0; x < mapSize; ++x)
+                {
+                    if (map[y, x] == ObjType.Wall) wallCoount++;
+                }
+            }
+
+            var sb = new StringBuilder();
+            sb.Append($"Метод создания: {MethodName}\n\n");
+
+            sb.Append($"[+] Время инициализации графа: {initTimeMs}ms\n");
+            sb.Append($"Размер матричного графа: {mapSize}x{mapSize}\n");
+            sb.Append($"Количество одиноких вершин: {wallCoount}\n");
+            sb.Append($"Количество соединений в графе: {(mapSize - 1) * mapSize * 2}\n\n");
+
+            sb.Append($"[+] Время поиска пути: {searchTimeMS}ms\n");
+            sb.Append($"Стартовая точка: {startN.Point}\n");
+            sb.Append($"Конечная точка: {finishN.Point}\n");
+            sb.Append($"Размер пути: {puth.Count}\n");
+            ExecLog(sb.ToString());
 
             var pointPuth = puth.Select(x => new Point(x.Point.X, x.Point.Y)).ToList();
             _MatrixPaintService.SetPuth(pointPuth);
