@@ -25,5 +25,7 @@ namespace WinFormsTest.Core.Interfaces.IViews
         IMatrixFrameBrush GetMatrixFrameDrawing();
 
         void BuildGrapbBox(List<string> Objs);
+
+        void ShowToolPanel();
     }
 }

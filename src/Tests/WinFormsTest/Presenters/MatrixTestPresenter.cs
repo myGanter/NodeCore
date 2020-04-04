@@ -11,6 +11,7 @@ using WinFormsTest.Core.Services;
 using System.Drawing;
 using System.Diagnostics;
 using NodeCore.Base;
+using Accessibility;
 
 namespace WinFormsTest.Presenters
 {
@@ -191,8 +192,16 @@ namespace WinFormsTest.Presenters
         private void View_Start(uint Size)
         {
             ExecLog($"Init canvas... Matrix size: {Size}");
+            var size = MatrixFrameBrush.GetCanvasSize();
+            if (size.Width < Size || size.Height < Size) 
+            {
+                ExecLog($"The graph size is too large!!!");
+                return;
+            }
 
             _MatrixPaintService.Init(Size);
+
+            View.ShowToolPanel();
         }
     }
 }

@@ -53,6 +53,11 @@ namespace WinFormsTest.Views
             return _PicBoxPainter;
         }
 
+        public void ShowToolPanel() 
+        {
+            ToolPanel.Visible = true;
+        }
+
         public void BuildGrapbBox(List<string> Objs) 
         {
             GraphBox.DataSource = Objs;
@@ -112,8 +117,7 @@ namespace WinFormsTest.Views
         private void StartBtn_Click(object sender, EventArgs e)
         {
             var value = (uint)SizePicker.Value;
-            OnStartBtn?.Invoke(value);
-            ToolPanel.Visible = true;
+            OnStartBtn?.Invoke(value);            
         }
 
         private void FillBtn_Click(object sender, EventArgs e)
