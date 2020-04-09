@@ -27,7 +27,7 @@ namespace NodeCore.Realization.RecursiveAlg
         public RecNode(string Name, RecGraph<T> Graph, Point3D Point = new Point3D())
         {
             if (Graph.NodeExist(Name))
-                throw new Exception($"Node {Name} exist");
+                throw new GraphEx($"Node {Name} exist");
 
             BondForProcess = new Dictionary<Guid, NodeBond<T>>();
             Connections = new Dictionary<string, Connection<T>>();
@@ -63,10 +63,10 @@ namespace NodeCore.Realization.RecursiveAlg
         {
             var node = ClBk(Graph, this);
             if (node == null)
-                throw new Exception("Node is null");
+                throw new GraphEx("Node is null");
 
             if (NodeExist(node) || node.NodeExist(this))
-                throw new Exception($"Node exist in {Name}");
+                throw new GraphEx($"Node exist in {Name}");
 
             var cntc = new Connection<T>(Distance, node, this, Dependence);
             Connections.Add(node.Name, cntc);
@@ -88,7 +88,7 @@ namespace NodeCore.Realization.RecursiveAlg
         private protected void AddNode(RecNode<T> Node, double Distance, Dependence Dependence)
         {
             if (Node.Graph != Graph)
-                throw new Exception("Nodes from different graphs");
+                throw new GraphEx("Nodes from different graphs");
 
             var cntc = new Connection<T>(Distance, Node, this, Dependence);
             Connections.Add(Node.Name, cntc);

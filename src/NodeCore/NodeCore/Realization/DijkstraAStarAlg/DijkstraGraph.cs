@@ -36,7 +36,7 @@ namespace NodeCore.Realization.DijkstraAStarAlg
             var node = new DijkstraNode<T>(NodeName, this, Point);
 
             if (NodeExist(node))
-                throw new Exception($"Node [Name: {NodeName}, Point: {Point}] exists");
+                throw new GraphEx($"Node [Name: {NodeName}, Point: {Point}] exists");
 
             AddNode(node);
 
@@ -50,11 +50,11 @@ namespace NodeCore.Realization.DijkstraAStarAlg
         public void DeleteNode(INode<T> Node) 
         {
             if (Node == null)
-                throw new Exception($"Node is null");
+                throw new GraphEx($"Node is null");
 
             var delNode = this[Node.Name];
             if (delNode != Node)
-                throw new Exception($"Node [Name: {Node.Name}, Point: {Node.Point}] was not found in the current graph");
+                throw new GraphEx($"Node [Name: {Node.Name}, Point: {Node.Point}] was not found in the current graph");
 
             RemoveNodeFromGraph((DijkstraNode<T>)delNode);
         }

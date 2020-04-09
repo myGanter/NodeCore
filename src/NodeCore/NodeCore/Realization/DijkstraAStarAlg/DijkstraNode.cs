@@ -42,7 +42,7 @@ namespace NodeCore.Realization.DijkstraAStarAlg
             var node = new DijkstraNode<T>(Name, DGraph, Point);
 
             if (DGraph.NodeExist(node.Name) || DGraph.NodeExist(node.Point))
-                throw new Exception($"Node [Name: {node.Name}, Point: {node.Point}] exists");
+                throw new GraphEx($"Node [Name: {node.Name}, Point: {node.Point}] exists");
 
             var cnct = new Connection<T>(Distance, node, this, Dependence);
 
@@ -70,13 +70,13 @@ namespace NodeCore.Realization.DijkstraAStarAlg
             var node = ClBk(DGraph, this);
 
             if (node == null)
-                throw new Exception($"Returned node is null");
+                throw new GraphEx($"Returned node is null");
 
             if (node.Graph != Graph || !DGraph.NodeExist(node))
-                throw new Exception($"Returned node was not found in the current graph");
+                throw new GraphEx($"Returned node was not found in the current graph");
 
             if (NodeExist(node) || node.NodeExist(this))
-                throw new Exception($"The node [Name: {Name}, Point: {Point}] to node [Name: {node.Name}, Point: {node.Point}] relationship already exists");
+                throw new GraphEx($"The node [Name: {Name}, Point: {Point}] to node [Name: {node.Name}, Point: {node.Point}] relationship already exists");
 
             var cnct = new Connection<T>(Distance, node, this, Dependence);
             DGraph.AddConnection(this, cnct);

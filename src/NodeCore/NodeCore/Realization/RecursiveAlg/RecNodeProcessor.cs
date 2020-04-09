@@ -38,10 +38,10 @@ namespace NodeCore.Realization.RecursiveAlg
             RecNode<T> Finish = (RecNode<T>)Finishh;
 
             if (Start.Graph != Finish.Graph)
-                throw new Exception("Nodes are in different graphs");
+                throw new ProcessorEx("Nodes are in different graphs");
 
             if (this.Finish != null || DistanceToFinish != null)
-                throw new Exception("The search has already begun");
+                throw new ProcessorEx("The search has already begun");
 
             UnicGuid = Guid.NewGuid();
             UnicGuids.Add(UnicGuid);

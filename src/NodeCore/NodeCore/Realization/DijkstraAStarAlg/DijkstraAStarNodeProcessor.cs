@@ -20,10 +20,10 @@ namespace NodeCore.Realization.DijkstraAStarAlg
         public override List<INode<T>> SearchPath(INode<T> Start, INode<T> Finish)
         {
             if (Start == null || Finish == null)
-                throw new Exception("Start or Finish is null");
+                throw new ProcessorEx("Start or Finish is null");
 
             if (Start.Graph != Finish.Graph || Start.Graph != Graph)
-                throw new Exception("Nodes are in different graphs");
+                throw new ProcessorEx("Nodes are in different graphs");
 
             if (Start == Finish || Start.ConnectionLength == 0)
                 return new List<INode<T>>() { Start };

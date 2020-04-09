@@ -53,7 +53,7 @@ namespace NodeCore.Realization.RecursiveAlg
 
         public void DeleteNode(INode<T> Node)
         {
-            throw new Exception("");
+            throw new GraphEx("");
         }
 
         public void Clear()
