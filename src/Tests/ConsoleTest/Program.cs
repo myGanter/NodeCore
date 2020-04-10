@@ -4,8 +4,10 @@ using NodeCore.Base;
 using System.Threading;
 using System.Threading.Tasks;
 using NodeCore.Realization;
+using System.IO;
 using System.Linq;
 using System.Collections.Generic;
+using NodeCore.Realization.Serialization;
 
 namespace ConsoleTest
 {
@@ -23,16 +25,38 @@ namespace ConsoleTest
             PerformanceTest("hash2", () => { for (var i = 0; i < 100000; ++i) { var s = new Point3D(i, 3).GetHashCode(); } }, false);
             Console.ReadKey();
 
-            int n = 90;
+            int n = 100;
             Console.Clear();
             CheckGetHashCodePoint3D(n);
             Console.ReadKey();
 
-            PerformanceTest("TestCreateRectGraph", () => { TestCreateRectGraph(n); });            
+            PerformanceTest("TestCreateRectGraph", () => { TestCreateRectGraph(n); });           
             PerformanceTest("TestSearchPathRectGraph", (sw) => { TestSearchPathRectGraph(sw, n); }, false);
             PerformanceTest("TestSearchPathRectGraph", (sw) => { TestSearchPathRectGraph(sw, n); }, false);
+            Console.ReadKey();
+
+            PerformanceTest("CheckSerialize", CheckSerialize);
+            PerformanceTest("CheckDeserialize", CheckDeserialize, false);
 
             Console.ReadKey();
+        }
+
+        static void CheckSerialize() 
+        {
+            if (File.Exists("test.bin"))
+                File.Delete("test.bin");
+            using (var fs = File.Open("test.bin", FileMode.Create))
+            {
+                StaticGraph.SerializeToBinary(fs);
+            }
+        }
+
+        static void CheckDeserialize()
+        {
+            using (var fs = File.Open("test.bin", FileMode.Open))
+            {
+                StaticGraph.BinaryDeserialize(fs);
+            }
         }
 
         static void CheckGetHashCodePoint3D(int n) 
