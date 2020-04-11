@@ -9,7 +9,7 @@ namespace NodeCore.Realization.DijkstraAStarAlg
     class DijkstraGraph<T> : IGraph<T>
     {
         #region interface
-        public string Name { get; }
+        public string Name { get; private set; }
 
         private Dictionary<string, Tuple<DijkstraNode<T>, List<Connection<T>>>> StrValDict;
         private Dictionary<Point3D, string> PointStrDict;
@@ -62,6 +62,12 @@ namespace NodeCore.Realization.DijkstraAStarAlg
         public void Clear()
         {
             InitDicts();
+        }
+
+        public void Clear(string NewGraphName) 
+        {
+            Name = NewGraphName;
+            Clear();
         }
 
         public INodeProcessor<T> CreateNodeProcessor() => ProcessorBuilder(this);

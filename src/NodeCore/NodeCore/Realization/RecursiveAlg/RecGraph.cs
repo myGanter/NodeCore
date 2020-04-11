@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Text;
 using NodeCore.Base;
 using System.Linq;
 
@@ -10,7 +8,7 @@ namespace NodeCore.Realization.RecursiveAlg
 {
     class RecGraph<T> : IGraph<T>
     {
-        public string Name { get; }
+        public string Name { get; private set; }
 
         public int NodeLength => Nodes.Count;
 
@@ -59,6 +57,12 @@ namespace NodeCore.Realization.RecursiveAlg
         public void Clear()
         {
             Nodes = new Dictionary<string, RecNode<T>>();
+        }
+
+        public void Clear(string NewGraphName) 
+        {
+            Name = NewGraphName;
+            Clear();
         }
 
         internal void AddNode(string Name, RecNode<T> Node) => Nodes.Add(Name, Node);

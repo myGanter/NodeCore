@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using NodeCore.Base;
 using System.IO;
 
@@ -10,13 +8,23 @@ namespace NodeCore.Realization.Serialization
     {
         public static void SerializeToBinary<T>(this IGraph<T> Graph, Stream SerializationStream) 
         {
-            var binSer = new GraphBinarySerializer<T>(Graph, SerializationStream);
+            SerializeToBinary(Graph, SerializationStream, true);
+        }
+
+        public static void SerializeToBinary<T>(this IGraph<T> Graph, Stream SerializationStream, bool UseCustomTypeSerializer)
+        {
+            var binSer = new GraphBinarySerializer<T>(Graph, SerializationStream, UseCustomTypeSerializer);
             binSer.Serialize();
         }
 
         public static void BinaryDeserialize<T>(this IGraph<T> Graph, Stream SerializationStream)
         {
-            var binSer = new GraphBinarySerializer<T>(Graph, SerializationStream);
+            BinaryDeserialize(Graph, SerializationStream, true);
+        }
+
+        public static void BinaryDeserialize<T>(this IGraph<T> Graph, Stream SerializationStream, bool UseCustomTypeSerializer)
+        {
+            var binSer = new GraphBinarySerializer<T>(Graph, SerializationStream, UseCustomTypeSerializer);
             binSer.Deserialize();
         }
 

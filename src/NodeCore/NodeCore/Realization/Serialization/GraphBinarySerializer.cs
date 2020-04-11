@@ -7,7 +7,70 @@ using NodeCore.Realization;
 
 namespace NodeCore.Realization.Serialization
 {
-    class GraphBinarySerializer<T>: IDisposable
+    public static class GraphBinarySerializer
+    {
+        private static readonly Dictionary<Type, Tuple<Delegate, Delegate>> TypeSerializeDeserializeCache;
+
+        static GraphBinarySerializer() 
+        {
+            TypeSerializeDeserializeCache = new Dictionary<Type, Tuple<Delegate, Delegate>>();
+        }
+
+        public static void ConfigureBaseTypes() 
+        {
+            SetCustomSerializeForT<bool>((n, w) => w.Write(n), r => r.ReadBoolean());
+
+            SetCustomSerializeForT<byte>((n, w) => w.Write(n), r => r.ReadByte());
+            SetCustomSerializeForT<sbyte>((n, w) => w.Write(n), r => r.ReadSByte());
+
+            SetCustomSerializeForT<short>((n, w) => w.Write(n), r => r.ReadInt16());
+            SetCustomSerializeForT<ushort>((n, w) => w.Write(n), r => r.ReadUInt16());
+
+            SetCustomSerializeForT<uint>((n, w) => w.Write(n), r => r.ReadUInt32());
+            SetCustomSerializeForT<int>((n, w) => w.Write(n), r => r.ReadInt32());
+
+            SetCustomSerializeForT<long>((n, w) => w.Write(n), r => r.ReadInt64());
+            SetCustomSerializeForT<ulong>((n, w) => w.Write(n), r => r.ReadUInt64());
+
+            SetCustomSerializeForT<double>((n, w) => w.Write(n), r => r.ReadDouble());
+
+            SetCustomSerializeForT<decimal>((n, w) => w.Write(n), r => r.ReadDecimal());
+
+            SetCustomSerializeForT<char>((n, w) => w.Write(n), r => r.ReadChar());
+
+            SetCustomSerializeForT<string>((n, w) => w.Write(n ?? string.Empty), r => r.ReadString());
+        }
+
+        public static void SetCustomSerializeForT<T>(Action<T, BinaryWriter> Serializer, Func<BinaryReader, T> Deserializer)
+        {
+            if (Serializer == null || Deserializer == null)
+                throw new GraphSerializationEx("Arguments cannot be null!");
+
+            var t = typeof(T);
+
+            if (TypeSerializeDeserializeCache.ContainsKey(t))
+                throw new GraphSerializationEx("Custom serialization for this type is already installed!");
+
+            TypeSerializeDeserializeCache.Add(t, new Tuple<Delegate, Delegate>(Serializer, Deserializer));
+        }
+
+        public static bool TypeContains(Type T) 
+        {
+            return TypeSerializeDeserializeCache.ContainsKey(T);
+        }
+
+        internal static Tuple<Delegate, Delegate> GetSerializer(Type T) 
+        {
+            return TypeSerializeDeserializeCache[T];
+        }
+
+        internal static bool TryGetSerializer(Type T, out Tuple<Delegate, Delegate> Value) 
+        {
+            return TypeSerializeDeserializeCache.TryGetValue(T, out Value);
+        }
+    }
+
+    public class GraphBinarySerializer<T>: IDisposable
     {
         public IGraph<T> Graph { get; private set; }
 
@@ -21,7 +84,12 @@ namespace NodeCore.Realization.Serialization
 
         private Dictionary<int, INode<T>> CacheD;
 
-        public GraphBinarySerializer(IGraph<T> Graph, Stream SerializationStream) 
+        private readonly Action<T, BinaryWriter> CustomTypeSerializer;
+        private readonly Func<BinaryReader, T> CustomTypeDeserializer;
+
+        private readonly bool UseCustomTypeSerializer;
+
+        public GraphBinarySerializer(IGraph<T> Graph, Stream SerializationStream, bool UseCustomTypeSerializer) 
         {
             if (Graph == null)
                 throw new GraphSerializationEx("Graph cannot be null!");
@@ -31,6 +99,15 @@ namespace NodeCore.Realization.Serialization
 
             this.Graph = Graph;
             this.SerializationStream = SerializationStream;
+
+            var t = typeof(T);
+
+            if (UseCustomTypeSerializer && GraphBinarySerializer.TryGetSerializer(t, out Tuple<Delegate, Delegate> customSerializer)) 
+            {
+                this.UseCustomTypeSerializer = true;
+                CustomTypeSerializer = (Action<T, BinaryWriter>)customSerializer.Item1;
+                CustomTypeDeserializer = (Func<BinaryReader, T>)customSerializer.Item2;
+            }            
         }
 
         public void Dispose() 
@@ -62,13 +139,13 @@ namespace NodeCore.Realization.Serialization
 
         public void Deserialize() 
         {
-            Graph.Clear();
             CacheD = new Dictionary<int, INode<T>>();
 
             try
             {
                 BR = new BinaryReader(SerializationStream);
                 var headInfo = ReadHeaderInfo();
+                Graph.Clear(headInfo.Item1);
                 ReadNodes(headInfo.Item2);
                 ReadConnections();
             }
@@ -117,6 +194,9 @@ namespace NodeCore.Realization.Serialization
                 var nodeName = n.Name ?? string.Empty;
                 BW.Write(nodeName);
 
+                if (UseCustomTypeSerializer)
+                    CustomTypeSerializer(n.Object, BW);
+
                 CacheS.Add(n, index);
             }
         }
@@ -132,6 +212,10 @@ namespace NodeCore.Realization.Serialization
                 var nName = BR.ReadString();
 
                 var n = Graph.AddNode(nName, new Point3D(x, y, z));
+
+                if (UseCustomTypeSerializer)
+                    n.Object = CustomTypeDeserializer(BR);
+
                 CacheD.Add(nIndex, n);
             }
         }

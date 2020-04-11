@@ -98,5 +98,11 @@ namespace NodeCore.Base
         /// Очищает граф
         /// </summary>
         void Clear();
+
+        /// <summary>
+        /// Очищает граф и устанавливает новое имя
+        /// </summary>
+        /// <param name="NewGraphName">Новое имя</param>
+        void Clear(string NewGraphName);
     }
 }
