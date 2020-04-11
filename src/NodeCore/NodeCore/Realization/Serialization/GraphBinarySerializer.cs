@@ -110,6 +110,17 @@ namespace NodeCore.Realization.Serialization
             }            
         }
 
+        public GraphBinarySerializer(IGraph<T> Graph, Stream SerializationStream, Action<T, BinaryWriter> CustomTSerializer, Func<BinaryReader, T> CustomTDeserializer) 
+            : this(Graph, SerializationStream, false)
+        {
+            if (CustomTSerializer == null || CustomTDeserializer == null)
+                throw new GraphSerializationEx("Arguments cannot be null!");
+
+            UseCustomTypeSerializer = true;
+            CustomTypeSerializer = CustomTSerializer;
+            CustomTypeDeserializer = CustomTDeserializer;
+        }
+
         public void Dispose() 
         {            
             GC.Collect();
