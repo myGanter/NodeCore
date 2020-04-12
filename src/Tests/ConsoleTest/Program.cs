@@ -35,6 +35,7 @@ namespace ConsoleTest
             PerformanceTest("TestSearchPathRectGraph", (sw) => { TestSearchPathRectGraph(sw, n); }, false);
             Console.ReadKey();
 
+            GraphBinarySerializer.ConfigureBaseTypes();
             PerformanceTest("CheckSerialize", CheckSerialize);
             PerformanceTest("CheckDeserialize", CheckDeserialize, false);
 

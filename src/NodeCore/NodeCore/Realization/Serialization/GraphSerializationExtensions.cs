@@ -6,6 +6,7 @@ namespace NodeCore.Realization.Serialization
 {
     public static class GraphSerializationExtensions
     {
+        #region Binary
         public static void SerializeToBinary<T>(this IGraph<T> Graph, Stream SerializationStream) 
         {
             SerializeToBinary(Graph, SerializationStream, true);
@@ -27,6 +28,7 @@ namespace NodeCore.Realization.Serialization
             var binSer = new GraphBinarySerializer<T>(Graph, SerializationStream, UseCustomTypeSerializer);
             binSer.Deserialize();
         }
+        #endregion
 
         public static void SerializeToXml<T>(this IGraph<T> Graph, Stream SerializationStream)
         {

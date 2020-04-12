@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.IO;
 using NodeCore.Base;
-using NodeCore.Realization;
 
 namespace NodeCore.Realization.Serialization
 {
@@ -56,15 +54,29 @@ namespace NodeCore.Realization.Serialization
 
         public static bool TypeContains(Type T) 
         {
+            if (T == null)
+                return false;
+
             return TypeSerializeDeserializeCache.ContainsKey(T);
         }
 
-        internal static Tuple<Delegate, Delegate> GetSerializer(Type T) 
+        public static void RemType(Type T) 
         {
+            if (T == null)
+                return;
+
+            TypeSerializeDeserializeCache.Remove(T);
+        }
+
+        public static Tuple<Delegate, Delegate> GetSerializer(Type T) 
+        {
+            if (T == null)
+                return null;
+
             return TypeSerializeDeserializeCache[T];
         }
 
-        internal static bool TryGetSerializer(Type T, out Tuple<Delegate, Delegate> Value) 
+        public static bool TryGetSerializer(Type T, out Tuple<Delegate, Delegate> Value) 
         {
             return TypeSerializeDeserializeCache.TryGetValue(T, out Value);
         }
