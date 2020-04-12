@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using NodeCore.Base;
 
 namespace NodeCore.Realization.Serialization
@@ -101,6 +103,8 @@ namespace NodeCore.Realization.Serialization
 
         private readonly bool UseCustomTypeSerializer;
 
+        private int IsWork;
+
         public GraphBinarySerializer(IGraph<T> Graph, Stream SerializationStream, bool UseCustomTypeSerializer) 
         {
             if (Graph == null)
@@ -140,6 +144,11 @@ namespace NodeCore.Realization.Serialization
 
         public void Serialize() 
         {
+            if (IsWork > 0)
+                throw new GraphSerializationEx("This serializer is already working!");
+
+            Interlocked.Exchange(ref IsWork, 1);
+
             CacheS = new Dictionary<INode<T>, int>();
 
             try
@@ -157,11 +166,22 @@ namespace NodeCore.Realization.Serialization
             {
                 BW.Dispose();
                 CacheS = null;
+                Interlocked.Exchange(ref IsWork, 0);
             }            
+        }
+
+        public async Task SerializeAsync() 
+        {
+            await Task.Run(new Action(Serialize));
         }
 
         public void Deserialize() 
         {
+            if (IsWork > 0)
+                throw new GraphSerializationEx("This serializer is already working!");
+
+            Interlocked.Exchange(ref IsWork, 1);
+
             CacheD = new Dictionary<int, INode<T>>();
 
             try
@@ -180,7 +200,13 @@ namespace NodeCore.Realization.Serialization
             {
                 BR.Dispose();
                 CacheD = null;
+                Interlocked.Exchange(ref IsWork, 0);
             }            
+        }
+
+        public async Task DeserializeAsync() 
+        {
+            await Task.Run(new Action(Deserialize));
         }
 
         private void WriteHeaderInfo() 

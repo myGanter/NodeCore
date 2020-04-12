@@ -1,6 +1,7 @@
 ﻿using System;
 using NodeCore.Base;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace NodeCore.Realization.Serialization
 {
@@ -18,6 +19,17 @@ namespace NodeCore.Realization.Serialization
             binSer.Serialize();
         }
 
+        public async static Task SerializeToBinaryAsync<T>(this IGraph<T> Graph, Stream SerializationStream)
+        {
+            await SerializeToBinaryAsync(Graph, SerializationStream, true);
+        }
+
+        public async static Task SerializeToBinaryAsync<T>(this IGraph<T> Graph, Stream SerializationStream, bool UseCustomTypeSerializer)
+        {
+            var binSer = new GraphBinarySerializer<T>(Graph, SerializationStream, UseCustomTypeSerializer);
+            await binSer.SerializeAsync();
+        }
+
         public static void BinaryDeserialize<T>(this IGraph<T> Graph, Stream SerializationStream)
         {
             BinaryDeserialize(Graph, SerializationStream, true);
@@ -27,6 +39,17 @@ namespace NodeCore.Realization.Serialization
         {
             var binSer = new GraphBinarySerializer<T>(Graph, SerializationStream, UseCustomTypeSerializer);
             binSer.Deserialize();
+        }
+
+        public async static Task BinaryDeserializeAsync<T>(this IGraph<T> Graph, Stream SerializationStream)
+        {
+            await BinaryDeserializeAsync(Graph, SerializationStream, true);
+        }
+
+        public async static Task BinaryDeserializeAsync<T>(this IGraph<T> Graph, Stream SerializationStream, bool UseCustomTypeSerializer)
+        {
+            var binSer = new GraphBinarySerializer<T>(Graph, SerializationStream, UseCustomTypeSerializer);
+            await binSer.DeserializeAsync();
         }
         #endregion
 

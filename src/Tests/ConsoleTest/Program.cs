@@ -39,6 +39,10 @@ namespace ConsoleTest
             PerformanceTest("CheckSerialize", CheckSerialize);
             PerformanceTest("CheckDeserialize", CheckDeserialize, false);
 
+            //проверка асинковых методов
+            PerformanceTest("CheckSerialize", () => CheckSerializeAsync());
+            PerformanceTest("CheckDeserialize", () => CheckDeserializeAsync(), false);
+
             Console.ReadKey();
         }
 
@@ -57,6 +61,24 @@ namespace ConsoleTest
             using (var fs = File.Open("test.bin", FileMode.Open))
             {
                 StaticGraph.BinaryDeserialize(fs);
+            }
+        }
+
+        static async Task CheckSerializeAsync()
+        {
+            if (File.Exists("test.bin"))
+                File.Delete("test.bin");
+            using (var fs = File.Open("test.bin", FileMode.Create))
+            {
+                await StaticGraph.SerializeToBinaryAsync(fs);
+            }
+        }
+
+        static async Task CheckDeserializeAsync()
+        {
+            using (var fs = File.Open("test.bin", FileMode.Open))
+            {
+                await StaticGraph.BinaryDeserializeAsync(fs);
             }
         }
 
