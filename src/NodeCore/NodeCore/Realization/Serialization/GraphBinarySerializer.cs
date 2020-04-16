@@ -84,12 +84,8 @@ namespace NodeCore.Realization.Serialization
         }
     }
 
-    public class GraphBinarySerializer<T>: IDisposable
+    public class GraphBinarySerializer<T>: BaseSerializer<T, Stream>
     {
-        public IGraph<T> Graph { get; private set; }
-
-        public Stream SerializationStream { get; private set; }
-
         private BinaryWriter BW;
 
         private BinaryReader BR;
@@ -103,18 +99,13 @@ namespace NodeCore.Realization.Serialization
 
         private readonly bool UseCustomTypeSerializer;
 
-        private int IsWork;
-
-        public GraphBinarySerializer(IGraph<T> Graph, Stream SerializationStream, bool UseCustomTypeSerializer) 
+        public GraphBinarySerializer(IGraph<T> Graph, Stream SerializationStream, bool UseCustomTypeSerializer): base(Graph, SerializationStream)
         {
             if (Graph == null)
                 throw new GraphSerializationEx("Graph cannot be null!");
 
             if (SerializationStream == null)
                 throw new GraphSerializationEx("The serialization thread cannot be null!");
-
-            this.Graph = Graph;
-            this.SerializationStream = SerializationStream;
 
             var t = typeof(T);
 
@@ -123,7 +114,10 @@ namespace NodeCore.Realization.Serialization
                 this.UseCustomTypeSerializer = true;
                 CustomTypeSerializer = (Action<T, BinaryWriter>)customSerializer.Item1;
                 CustomTypeDeserializer = (Func<BinaryReader, T>)customSerializer.Item2;
-            }            
+            }
+
+            OnFinishSerialize += GraphBinarySerializer_OnFinishSerialize;
+            OnFinishDeserialize += GraphBinarySerializer_OnFinishDeserialize;
         }
 
         public GraphBinarySerializer(IGraph<T> Graph, Stream SerializationStream, Action<T, BinaryWriter> CustomTSerializer, Func<BinaryReader, T> CustomTDeserializer) 
@@ -137,76 +131,34 @@ namespace NodeCore.Realization.Serialization
             CustomTypeDeserializer = CustomTDeserializer;
         }
 
-        public void Dispose() 
+        public override void Dispose() 
         {            
             GC.Collect();
         }
 
-        public void Serialize() 
+        protected override void DoSerialize()
         {
-            if (IsWork > 0)
-                throw new GraphSerializationEx("This serializer is already working!");
-
-            Interlocked.Exchange(ref IsWork, 1);
-
             CacheS = new Dictionary<INode<T>, int>();
 
-            try
-            {
-                BW = new BinaryWriter(SerializationStream);
+            using (BW = new BinaryWriter(SerializationObj))
+            {                
                 WriteHeaderInfo();
                 WriteNodes();
                 WriteConnections();
-            }
-            catch (Exception e)
-            {
-                throw new GraphSerializationEx("Serialization error!", e);
-            }
-            finally 
-            {
-                BW.Dispose();
-                CacheS = null;
-                Interlocked.Exchange(ref IsWork, 0);
-            }            
+            }          
         }
 
-        public async Task SerializeAsync() 
+        protected override void DoDeserialize()
         {
-            await Task.Run(new Action(Serialize));
-        }
-
-        public void Deserialize() 
-        {
-            if (IsWork > 0)
-                throw new GraphSerializationEx("This serializer is already working!");
-
-            Interlocked.Exchange(ref IsWork, 1);
-
             CacheD = new Dictionary<int, INode<T>>();
 
-            try
-            {
-                BR = new BinaryReader(SerializationStream);
+            using (BR = new BinaryReader(SerializationObj))
+            {                
                 var headInfo = ReadHeaderInfo();
                 Graph.Clear(headInfo.Item1);
                 ReadNodes(headInfo.Item2);
                 ReadConnections();
-            }
-            catch (Exception e)
-            {
-                throw new GraphSerializationEx("Deserialization error!", e);
-            }
-            finally 
-            {
-                BR.Dispose();
-                CacheD = null;
-                Interlocked.Exchange(ref IsWork, 0);
-            }            
-        }
-
-        public async Task DeserializeAsync() 
-        {
-            await Task.Run(new Action(Deserialize));
+            }          
         }
 
         private void WriteHeaderInfo() 
@@ -321,6 +273,16 @@ namespace NodeCore.Realization.Serialization
                 var cn = CacheD[chIndex];
                 pn.AddNode(distance, dependence, (g, n) => cn);
             }
+        }
+
+        private void GraphBinarySerializer_OnFinishDeserialize(object obj)
+        {
+            CacheD = null;
+        }
+
+        private void GraphBinarySerializer_OnFinishSerialize(object obj)
+        {
+            CacheS = null;
         }
     }
 }

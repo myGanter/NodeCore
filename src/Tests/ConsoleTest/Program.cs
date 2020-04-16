@@ -38,10 +38,11 @@ namespace ConsoleTest
             GraphBinarySerializer.ConfigureBaseTypes();
             PerformanceTest("CheckSerialize", CheckSerialize);
             PerformanceTest("CheckDeserialize", CheckDeserialize, false);
+            Console.ReadKey();
 
             //проверка асинковых методов
-            PerformanceTest("CheckSerialize", () => CheckSerializeAsync());
-            PerformanceTest("CheckDeserialize", () => CheckDeserializeAsync(), false);
+            PerformanceTest("CheckSerializeAsync", () => CheckSerializeAsync().Wait());
+            PerformanceTest("CheckDeserializeAsync", () => CheckDeserializeAsync().Wait(), false);
 
             Console.ReadKey();
         }
