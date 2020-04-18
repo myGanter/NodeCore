@@ -101,12 +101,6 @@ namespace NodeCore.Realization.Serialization
 
         public GraphBinarySerializer(IGraph<T> Graph, Stream SerializationStream, bool UseCustomTypeSerializer): base(Graph, SerializationStream)
         {
-            if (Graph == null)
-                throw new GraphSerializationEx("Graph cannot be null!");
-
-            if (SerializationStream == null)
-                throw new GraphSerializationEx("The serialization thread cannot be null!");
-
             var t = typeof(T);
 
             if (UseCustomTypeSerializer && GraphBinarySerializer.TryGetSerializer(t, out Tuple<Delegate, Delegate> customSerializer)) 

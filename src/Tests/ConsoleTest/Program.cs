@@ -8,12 +8,23 @@ using System.IO;
 using System.Linq;
 using System.Collections.Generic;
 using NodeCore.Realization.Serialization;
+using System.Text;
+using System.Xml.Serialization;
 
 namespace ConsoleTest
 {
+    public class TestObj
+    {
+        public string A1 = "test1";
+
+        public int A2 = 23;
+
+        public double A3 { get; set; } = 43.22;
+    }
+
     class Program
     {
-        static IGraph<string> StaticGraph;
+        static IGraph<TestObj> StaticGraph;
 
         static void Main(string[] args)
         {
@@ -44,6 +55,21 @@ namespace ConsoleTest
             PerformanceTest("CheckSerializeAsync", () => CheckSerializeAsync().Wait());
             PerformanceTest("CheckDeserializeAsync", () => CheckDeserializeAsync().Wait(), false);
 
+            foreach (var i in StaticGraph)
+            {
+                i.Object = new TestObj();
+            }
+
+            var sb = new StringBuilder();
+            var ns = new XmlSerializerNamespaces();
+            ns.Add("", "");
+            var sbb = new SBXmlSerializer<TestObj>(StaticGraph, sb, true, ns);
+            sbb.Serialize();
+            sbb.Dispose();
+            Console.Clear();
+
+            File.WriteAllText("qew.xml", sb.ToString());
+
             Console.ReadKey();
         }
 
@@ -53,7 +79,7 @@ namespace ConsoleTest
                 File.Delete("test.bin");
             using (var fs = File.Open("test.bin", FileMode.Create))
             {
-                StaticGraph.SerializeToBinary(fs);
+                StaticGraph.SerializeToBinary(fs, true);
             }
         }
 
@@ -61,7 +87,7 @@ namespace ConsoleTest
         {
             using (var fs = File.Open("test.bin", FileMode.Open))
             {
-                StaticGraph.BinaryDeserialize(fs);
+                StaticGraph.BinaryDeserialize(fs, true);
             }
         }
 
@@ -71,7 +97,7 @@ namespace ConsoleTest
                 File.Delete("test.bin");
             using (var fs = File.Open("test.bin", FileMode.Create))
             {
-                await StaticGraph.SerializeToBinaryAsync(fs);
+                await StaticGraph.SerializeToBinaryAsync(fs, true);
             }
         }
 
@@ -79,7 +105,7 @@ namespace ConsoleTest
         {
             using (var fs = File.Open("test.bin", FileMode.Open))
             {
-                await StaticGraph.BinaryDeserializeAsync(fs);
+                await StaticGraph.BinaryDeserializeAsync(fs, true);
             }
         }
 
@@ -115,7 +141,7 @@ namespace ConsoleTest
 
         static void TestCreateRectGraph(int n) 
         {
-            StaticGraph = GraphFactory.CreateDijkstraGraph<string>("rect");
+            StaticGraph = GraphFactory.CreateDijkstraGraph<TestObj>("rect");
             var rn = StaticGraph.AddNode("root");
             //StaticGraph.AddNode("test", new Point3D(n + 30, n + 30));
 
