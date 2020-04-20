@@ -1,7 +1,5 @@
 ﻿using NodeCore.Base;
 using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace NodeCore.Realization.Serialization
@@ -22,13 +20,10 @@ namespace NodeCore.Realization.Serialization
 
         public BaseSerializer(IGraph<T> Graph, O SerializationObj) 
         {
-            if (Graph == null)
-                throw new GraphSerializationEx("Graph cannot be null!");
-
             if (SerializationObj == null)
                 throw new GraphSerializationEx("The serialization object cannot be null!");
 
-            this.Graph = Graph;
+            this.Graph = Graph ?? throw new GraphSerializationEx("Graph cannot be null!");
             this.SerializationObj = SerializationObj;
 
             Locker = new object();
@@ -42,6 +37,10 @@ namespace NodeCore.Realization.Serialization
             try
             {
                 DoDeserialize();
+            }
+            catch (GraphSerializationEx e) 
+            {
+                throw e;
             }
             catch (Exception e)
             {
@@ -67,6 +66,10 @@ namespace NodeCore.Realization.Serialization
             try
             {
                 DoSerialize();
+            }
+            catch (GraphSerializationEx e)
+            {
+                throw e;
             }
             catch (Exception e)
             {

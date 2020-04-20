@@ -47,30 +47,64 @@ namespace ConsoleTest
             Console.ReadKey();
 
             GraphBinarySerializer.ConfigureBaseTypes();
-            PerformanceTest("CheckSerialize", CheckSerialize);
-            PerformanceTest("CheckDeserialize", CheckDeserialize, false);
+            PerformanceTest("CheckBinSerialize", CheckSerialize);
+            PerformanceTest("CheckBinDeserialize", CheckDeserialize, false);
             Console.ReadKey();
 
             //проверка асинковых методов
-            PerformanceTest("CheckSerializeAsync", () => CheckSerializeAsync().Wait());
-            PerformanceTest("CheckDeserializeAsync", () => CheckDeserializeAsync().Wait(), false);
+            PerformanceTest("CheckBinSerializeAsync", () => CheckSerializeAsync().Wait());
+            PerformanceTest("CheckBinDeserializeAsync", () => CheckDeserializeAsync().Wait(), false);
+            Console.ReadKey();
 
             foreach (var i in StaticGraph)
             {
                 i.Object = new TestObj();
             }
 
-            var sb = new StringBuilder();
-            var ns = new XmlSerializerNamespaces();
-            ns.Add("", "");
-            var sbb = new SBXmlSerializer<TestObj>(StaticGraph, sb, true, ns);
-            sbb.Serialize();
-            sbb.Dispose();
-            Console.Clear();
-
-            File.WriteAllText("qew.xml", sb.ToString());
-
+            PerformanceTest("CheckXMLSerialize", CheckSerializeXML);
+            PerformanceTest("CheckXMLDeserialize", CheckDeserializeXML, false);
             Console.ReadKey();
+
+            //проверка асинковых методов
+            PerformanceTest("CheckXMLSerializeAsync", () => CheckSerializeXMLAsync().Wait());
+            PerformanceTest("CheckXMLDeserializeAsync", () => CheckDeserializeXMLAsync().Wait(), false);
+            Console.ReadKey();
+        }
+
+        static void CheckSerializeXML()
+        {
+            if (File.Exists("test.xml"))
+                File.Delete("test.xml");
+            using (var fs = File.Open("test.xml", FileMode.Create))
+            {
+                StaticGraph.SerializeToXml(fs, true);
+            }
+        }
+
+        static void CheckDeserializeXML()
+        {
+            using (var fs = File.Open("test.xml", FileMode.Open))
+            {
+                StaticGraph.XmlDeserialize(fs, true);
+            }
+        }
+
+        static async Task CheckSerializeXMLAsync()
+        {
+            if (File.Exists("test.xml"))
+                File.Delete("test.xml");
+            using (var fs = File.Open("test.xml", FileMode.Create))
+            {
+                await StaticGraph.SerializeToXmlAsync(fs, true);
+            }
+        }
+
+        static async Task CheckDeserializeXMLAsync()
+        {
+            using (var fs = File.Open("test.xml", FileMode.Open))
+            {
+                await StaticGraph.XmlDeserializeAsync(fs, true);
+            }
         }
 
         static void CheckSerialize() 
