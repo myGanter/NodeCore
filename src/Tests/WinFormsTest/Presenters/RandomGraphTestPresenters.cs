@@ -56,10 +56,9 @@ namespace WinFormsTest.Presenters
 
             Task.Run(() =>
             {
-                ProcTimer.ProcTest("End process", StartProcess);
                 try 
                 { 
-                    
+                    ProcTimer.ProcTest("End process", StartProcess);                    
                 } 
                 catch (Exception e) 
                 {
