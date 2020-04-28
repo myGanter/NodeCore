@@ -160,7 +160,7 @@ namespace WinFormsTest.Presenters
                         List<INode<string>> puth = null;
 
                         ProcTimer.ProcTest($"Serch {model.Start} -> {model.Finish}", () => puth = nodeProc.SearchPath(graph[model.Start], graph[model.Finish]));
-                        ProcTimer.ProcTest($"Draw puth {model.Start} -> {model.Finish}", () => DrawPuth(img, puth, fileName + $"{model.Start} - {model.Finish}"));
+                        ProcTimer.ProcTest($"Draw puth {model.Start} -> {model.Finish}", () => DrawPuth((Bitmap)img.Clone(), puth, fileName + $"{model.Start} - {model.Finish}"));
                     }
                     else
                         return;
