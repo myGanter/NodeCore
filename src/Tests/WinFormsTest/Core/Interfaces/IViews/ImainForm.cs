@@ -13,5 +13,7 @@ namespace WinFormsTest.Core.Interfaces.IViews
         void Log(string LogText, Color HColor);
 
         event Action<Type> Start;
+
+        object Invoke(Delegate Clbk);
     }
 }

@@ -27,6 +27,7 @@ namespace WinFormsTest.Presenters
 
             var attr = new FrameElementArg();
             attr.Log += Log;
+            attr.Invoke += clbk => View.Invoke(clbk);
 
             Controller.Run<FrameElementArg>(PType, attr);
         }

@@ -68,7 +68,8 @@ namespace WinFormsTest.Core.Services
             var res = Assembly
                 .GetCallingAssembly()
                 .GetTypes()
-                .Where(x => x.Namespace.EndsWith("Presenters")
+                .Where(x => x.Namespace != null
+                            && x.Namespace.EndsWith("Presenters")
                             && x.GetInterfaces().Any(x => x == presenteType)
                             && x.GetCustomAttribute(AttrType) != null);
 

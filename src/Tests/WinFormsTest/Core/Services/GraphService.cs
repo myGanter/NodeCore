@@ -33,6 +33,14 @@ namespace WinFormsTest.Core.Services
             return ch[MethodName](GraphName);
         }
 
+        public bool ContainsMethod(string MethodName) 
+        {
+            if (MethodName == null)
+                return false;
+
+            return Chache.Value.ContainsKey(MethodName);
+        }
+
         private Dictionary<string, Func<string, IGraph<T>>> CreateDict() 
         {
             var factoryType = typeof(GraphFactory);
