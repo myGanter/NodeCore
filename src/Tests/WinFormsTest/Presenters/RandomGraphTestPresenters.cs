@@ -17,6 +17,7 @@ using System.Linq;
 using System.Threading;
 using System.Drawing.Imaging;
 using System.Diagnostics;
+using WinFormsTest.Core.Expansion;
 using System.Runtime.InteropServices;
 
 namespace WinFormsTest.Presenters
@@ -94,7 +95,7 @@ namespace WinFormsTest.Presenters
                     ProcTimer.ProcTest(() => "Node length " + graph.NodeLength.ToString(), () => RandomNodes(graph, settings.NodeCount, settings.PicSize));
 
                     if (settings.SmartRandom)
-                        ProcTimer.ProcTest("Edges smart random end", () => SmartRandomEdjes(graph, settings.MaxEdjesInNode));
+                        ProcTimer.ProcTest("Edges smart random end", () => SmartRandomEdjes(graph, settings));
                     else
                         ProcTimer.ProcTest("Edges random end", () => RandomEdjes(graph, settings.MaxEdjesInNode));
 
@@ -177,7 +178,7 @@ namespace WinFormsTest.Presenters
             var nodeDiametrPx = NodeRadiusPx << 1;
             var g = Graphics.FromImage(Img);
             var bG = new SolidBrush(Color.Green);
-            var pG = new Pen(bG, 2);
+            var pG = new Pen(bG, 3);
             var bG05 = new SolidBrush(Color.FromArgb(80, Color.Green));
 
             if (Puth.Count > 1) 
@@ -229,8 +230,8 @@ namespace WinFormsTest.Presenters
             var bW = new SolidBrush(Color.Aqua); 
             var bW05 = new SolidBrush(Color.FromArgb(200, Color.White));
             var bO05 = new SolidBrush(Color.FromArgb(200, Color.Red));
-            var pW05 = new Pen(bW05, 1);
-            var pO05 = new Pen(bO05, 2);
+            var pW05 = new Pen(bW05, 3);
+            var pO05 = new Pen(bO05, 6);
             var bO = Brushes.Black;
             var font = new Font("Consolas", 12);
 
@@ -293,50 +294,99 @@ namespace WinFormsTest.Presenters
             return img;
         }
 
-        private void SmartRandomEdjes(IGraph<string> Graph, int MaxEdjesInNode) 
+        private List<Point3D>[,] CreateChank(IGraph<string> Graph, int MaxSize) 
+        {
+            var chankSize = MaxSize / 10;
+            var res = new List<Point3D>[10, 10];
+
+            foreach (var n in Graph) 
+            {
+                var np = n.Point;
+                var i = np.Y / chankSize;
+                var j = np.X / chankSize;
+
+                if (res[i, j] == null)
+                    res[i, j] = new List<Point3D>();
+
+                res[i, j].Add(np);
+            }
+
+            return res;
+        }
+
+        private List<Point3D> GetArea(List<Point3D>[,] Chank, int I, int J) 
+        {
+            var res = new List<List<Point3D>>
+            {
+                Chank[I, J]
+            };
+
+            var l = J - 1 >= 0;
+            var r = J + 1 < Chank.GetLength(1);
+            var u = I - 1 >= 0;
+            var d = I + 1 < Chank.GetLength(0);
+
+            if (l)
+                res.Add(Chank[I, J - 1]);
+            if (r)
+                res.Add(Chank[I, J + 1]);
+            if (u)
+                res.Add(Chank[I - 1, J]);
+            if (d)
+                res.Add(Chank[I + 1, J]);
+            if (l && u)
+                res.Add(Chank[I - 1, J - 1]);
+            if (r && u)
+                res.Add(Chank[I - 1, J + 1]);
+            if (l && d)
+                res.Add(Chank[I + 1, J - 1]);
+            if (r && d)
+                res.Add(Chank[I + 1, J + 1]);
+
+            return res.Сombine().ToList();
+        }
+
+        private void SmartRandomEdjes(IGraph<string> Graph, InitModel Settings) 
         {
             var nodeLength = Graph.NodeLength;
             var oneValProcent = 50d / nodeLength;
             var procentCounter = 0d;
             var taskBarCounter = 0;
 
+            var chankSize = Settings.PicSize / 10;
+            var maxDistance = chankSize / 2;
+
             var cache = Graph.ToArray();
+            var chank = CreateChank(Graph, Settings.PicSize);
 
-            foreach (var n in Graph) 
+            for (var i = 0; i < Graph.NodeLength; ++i) 
             {
-                if (Rnd.Next(100) >= 10)
+                var n = cache[Rnd.Next(nodeLength)];
+
+                if (n.ConnectionLength > 1)
                     continue;
 
-                var targetNode = cache[Rnd.Next(nodeLength)];
-                var puthL = Rnd.Next(MaxEdjesInNode + 1);
+                var puthL = Rnd.Next((int)(nodeLength * 0.3));
 
-                if (targetNode == n || targetNode.NodeExist(n) || n.NodeExist(targetNode))
-                    continue;
-
-                INode<string> curN = n;
-                for (var i = 0; i < puthL - 1; ++i) 
+                for (var j = 0; j < puthL; ++j) 
                 {
-                    var newN = cache[Rnd.Next(nodeLength)];
+                    var curP = n.Point;
+                    var area = GetArea(chank, curP.Y / chankSize, curP.X / chankSize);
 
-                    if (newN == curN || newN.NodeExist(curN) || curN.NodeExist(newN))
-                        continue;
+                    var suitablePoints = area.Where(x => Math.Sqrt(Math.Pow(curP.X - x.X, 2) + Math.Pow(curP.Y - x.Y, 2) + Math.Pow(curP.Z - x.Z, 2)) <= maxDistance).ToList();
 
-                    var P1 = curN.Point;
-                    var P2 = newN.Point;
-                    var distance = Math.Sqrt(Math.Pow(P1.X - P2.X, 2) + Math.Pow(P1.Y - P2.Y, 2) + Math.Pow(P1.Z - P2.Z, 2));
+                    var rndNode = Graph[suitablePoints[Rnd.Next(suitablePoints.Count)]];
 
-                    curN = Rnd.Next(2) == 0 ? curN.AddNodeDD((n, g) => newN, distance) : curN.AddNodeDS((n, g) => newN, distance);
+                    if (n != rndNode && !rndNode.NodeExist(n) && !n.NodeExist(rndNode))
+                    {
+                        var P1 = n.Point;
+                        var P2 = rndNode.Point;
+                        var distance = Math.Sqrt(Math.Pow(P1.X - P2.X, 2) + Math.Pow(P1.Y - P2.Y, 2) + Math.Pow(P1.Z - P2.Z, 2));
 
-                    curN = newN;
-                }
+                        n = Rnd.Next(2) == 0 ? n.AddNodeDD((n, g) => rndNode, distance) : n.AddNodeDS((n, g) => rndNode, distance);
 
-                if (targetNode != curN && !targetNode.NodeExist(curN) && !curN.NodeExist(targetNode)) 
-                {
-                    var P1 = curN.Point;
-                    var P2 = targetNode.Point;
-                    var distance = Math.Sqrt(Math.Pow(P1.X - P2.X, 2) + Math.Pow(P1.Y - P2.Y, 2) + Math.Pow(P1.Z - P2.Z, 2));
-
-                    curN = Rnd.Next(2) == 0 ? curN.AddNodeDD((n, g) => targetNode, distance) : curN.AddNodeDS((n, g) => targetNode, distance);
+                        n = rndNode;
+                    }
                 }
 
                 procentCounter += oneValProcent;
