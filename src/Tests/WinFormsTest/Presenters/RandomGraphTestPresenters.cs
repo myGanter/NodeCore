@@ -92,7 +92,11 @@ namespace WinFormsTest.Presenters
                 {
                     ExecLog($"[+] Start random {settings.NodeCount} nodes");
                     ProcTimer.ProcTest(() => "Node length " + graph.NodeLength.ToString(), () => RandomNodes(graph, settings.NodeCount, settings.PicSize));
-                    ProcTimer.ProcTest("Edges random end", () => RandomEdjes(graph, settings.MaxEdjesInNode));
+
+                    if (settings.SmartRandom)
+                        ProcTimer.ProcTest("Edges smart random end", () => SmartRandomEdjes(graph, settings.MaxEdjesInNode));
+                    else
+                        ProcTimer.ProcTest("Edges random end", () => RandomEdjes(graph, settings.MaxEdjesInNode));
 
                     var sfd = new SaveFileDialog();
                     DialogResult sfdResult = DialogResult.Cancel;
@@ -289,6 +293,66 @@ namespace WinFormsTest.Presenters
             return img;
         }
 
+        private void SmartRandomEdjes(IGraph<string> Graph, int MaxEdjesInNode) 
+        {
+            var nodeLength = Graph.NodeLength;
+            var oneValProcent = 50d / nodeLength;
+            var procentCounter = 0d;
+            var taskBarCounter = 0;
+
+            var cache = Graph.ToArray();
+
+            foreach (var n in Graph) 
+            {
+                if (Rnd.Next(100) >= 10)
+                    continue;
+
+                var targetNode = cache[Rnd.Next(nodeLength)];
+                var puthL = Rnd.Next(MaxEdjesInNode + 1);
+
+                if (targetNode == n || targetNode.NodeExist(n) || n.NodeExist(targetNode))
+                    continue;
+
+                INode<string> curN = n;
+                for (var i = 0; i < puthL - 1; ++i) 
+                {
+                    var newN = cache[Rnd.Next(nodeLength)];
+
+                    if (newN == curN || newN.NodeExist(curN) || curN.NodeExist(newN))
+                        continue;
+
+                    var P1 = curN.Point;
+                    var P2 = newN.Point;
+                    var distance = Math.Sqrt(Math.Pow(P1.X - P2.X, 2) + Math.Pow(P1.Y - P2.Y, 2) + Math.Pow(P1.Z - P2.Z, 2));
+
+                    curN = Rnd.Next(2) == 0 ? curN.AddNodeDD((n, g) => newN, distance) : curN.AddNodeDS((n, g) => newN, distance);
+
+                    curN = newN;
+                }
+
+                if (targetNode != curN && !targetNode.NodeExist(curN) && !curN.NodeExist(targetNode)) 
+                {
+                    var P1 = curN.Point;
+                    var P2 = targetNode.Point;
+                    var distance = Math.Sqrt(Math.Pow(P1.X - P2.X, 2) + Math.Pow(P1.Y - P2.Y, 2) + Math.Pow(P1.Z - P2.Z, 2));
+
+                    curN = Rnd.Next(2) == 0 ? curN.AddNodeDD((n, g) => targetNode, distance) : curN.AddNodeDS((n, g) => targetNode, distance);
+                }
+
+                procentCounter += oneValProcent;
+
+                if (procentCounter >= 5)
+                {
+                    taskBarCounter += 5;
+                    procentCounter -= 5;
+                    ExecLog($"[smart random] {taskBarCounter + 50}/100");
+                }
+            }
+
+            if (taskBarCounter < 50 && Math.Round(procentCounter) >= 5)
+                ExecLog($"[smart random] 100/100");
+        }
+
         private void RandomEdjes(IGraph<string> Graph, int MaxEdjesInNode) 
         {
             var nodeLength = Graph.NodeLength;
@@ -421,6 +485,8 @@ namespace WinFormsTest.Presenters
             public List<string> GraphTypes;
 
             public bool T_Rnd_Or_F_Deseri { get; set; }
+
+            public bool SmartRandom { get; set; }
         }
     }    
 }

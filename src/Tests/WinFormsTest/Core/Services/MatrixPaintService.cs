@@ -33,6 +33,9 @@ namespace WinFormsTest.Core.Services
         private Bitmap FinishTexture { get; set; }
         private Bitmap ConvertFinishTexture { get; set; }
 
+        private Bitmap WaterTexture { get; set; }
+        private Bitmap ConvertWaterTexture { get; set; }
+
         private int CellH { get; set; }
 
         private int CellW { get; set; }
@@ -191,6 +194,9 @@ namespace WinFormsTest.Core.Services
                 case ObjType.Wall:
                     MatrixFrameBrush.DrawImage(ConvertWallTexture, X, Y);
                     break;
+                case ObjType.Water:
+                    MatrixFrameBrush.DrawImage(ConvertWaterTexture, X, Y);
+                    break;
             }
         }
 
@@ -204,11 +210,14 @@ namespace WinFormsTest.Core.Services
                 StartTexture.Dispose();
             if (FinishTexture != null)
                 FinishTexture.Dispose();
+            if (WaterTexture != null)
+                WaterTexture.Dispose();
 
             WallTexture = new Bitmap(@"Textures\wall.jpg");
             GrassTexture = new Bitmap(@"Textures\gross.jpg");
             StartTexture = new Bitmap(@"Textures\start.jpg");
             FinishTexture = new Bitmap(@"Textures\finish.jpg");
+            WaterTexture = new Bitmap(@"Textures\water.jpg");
         }
 
         private bool InitConvertTextures() 
@@ -221,6 +230,8 @@ namespace WinFormsTest.Core.Services
                 ConvertStartTexture.Dispose();
             if (ConvertFinishTexture != null)
                 ConvertFinishTexture.Dispose();
+            if (ConvertWaterTexture != null)
+                ConvertWaterTexture.Dispose();
 
             var mSizeValue = (int)MatrixSize.Value;
             var canvasSize = MatrixFrameBrush.GetCanvasSize();
@@ -232,6 +243,7 @@ namespace WinFormsTest.Core.Services
 
             ConvertGrassTexture = new Bitmap(GrassTexture, CellW, CellH);
             ConvertWallTexture = new Bitmap(WallTexture, CellW, CellH);
+            ConvertWaterTexture = new Bitmap(WaterTexture, CellW, CellH);
 
             var div2W = (int)Math.Ceiling(CellW / 1.2f);
             var div2H = (int)Math.Ceiling(CellH / 1.2f);
@@ -251,6 +263,7 @@ namespace WinFormsTest.Core.Services
     public enum ObjType
     {
         Grass,
-        Wall
+        Wall,
+        Water
     }
 }

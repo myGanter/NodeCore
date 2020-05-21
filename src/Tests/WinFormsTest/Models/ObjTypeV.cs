@@ -8,6 +8,7 @@ namespace WinFormsTest.Models
     {
         Grass,
         Wall,
+        Water,
         Start,
         Finish
     }

@@ -26,6 +26,10 @@ namespace WinFormsTest.Presenters
 
         private readonly GraphService<string> _GraphService;
 
+        private const double WaterCost = 5;
+
+        private const double GrassCost = 1;
+
         public MatrixTestPresenter(IAppFactory Controller, IMatrixForm View, MatrixPaintService MatrixPaintService, GraphService<string> GraphService) : base(Controller, View)
         {
             _MatrixPaintService = MatrixPaintService;
@@ -78,14 +82,14 @@ namespace WinFormsTest.Presenters
                     if (x > 0 && map[y, x] != ObjType.Wall && map[y, pastX] != ObjType.Wall) 
                     {
                         var pastP = new Point3D(pastX, y);
-                        node.AddNodeDD((g, n) => g[pastP]);
+                        node.AddNodeDD((g, n) => g[pastP], map[y, x] == ObjType.Water || map[y, pastX] == ObjType.Water ? WaterCost : GrassCost);
                     }
 
                     var pastY = y - 1;
                     if (y > 0 && map[y, x] != ObjType.Wall && map[pastY, x] != ObjType.Wall) 
                     {
                         var pastP = new Point3D(x, pastY);
-                        node.AddNodeDD((g, n) => g[pastP]);
+                        node.AddNodeDD((g, n) => g[pastP], map[y, x] == ObjType.Water || map[pastY, x] == ObjType.Water ? WaterCost : GrassCost);
                     }
                 }
             }            
@@ -141,6 +145,7 @@ namespace WinFormsTest.Presenters
             {
                 case ObjTypeV.Grass:
                 case ObjTypeV.Wall:
+                case ObjTypeV.Water:
                     _MatrixPaintService.Fill((ObjType)Obj);
                     break;
             }
@@ -155,6 +160,7 @@ namespace WinFormsTest.Presenters
             {
                 case ObjTypeV.Grass:
                 case ObjTypeV.Wall:
+                case ObjTypeV.Water:
                     _MatrixPaintService.DrawObj((ObjType)Obj, P);
                     break;
                 case ObjTypeV.Start:

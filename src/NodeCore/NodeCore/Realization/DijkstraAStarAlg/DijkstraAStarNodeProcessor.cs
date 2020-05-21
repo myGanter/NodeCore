@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using NodeCore.Base;
+using NodeCore.Realization.Services;
 using NodeCore.Realization.Universal;
 
 namespace NodeCore.Realization.DijkstraAStarAlg
@@ -65,7 +66,7 @@ namespace NodeCore.Realization.DijkstraAStarAlg
                 if (queue.Count == 0 || activeNode == Finish)
                     break;
 
-                var minNode = NodeFlightBirdSearch(queue, Finish.Point);
+                var minNode = Helper.NodeFlightBirdSearch(queue, Finish.Point);
                 queue.Remove(minNode);// для оптимизации удаления можно использовать HashSet
                 activeNode = minNode;
             } while (true);
@@ -76,7 +77,7 @@ namespace NodeCore.Realization.DijkstraAStarAlg
             }
             else
             {
-                var newFinish = NodeFlightBirdSearch(checkedNodes.Select(x => x.Key), Finish.Point);
+                var newFinish = Helper.NodeFlightBirdSearch(checkedNodes.Select(x => x.Key), Finish.Point);
 
                 return RecoverPuth(checkedNodes, Start, newFinish /*nearNode.Item2*/);
             }
