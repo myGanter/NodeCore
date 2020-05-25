@@ -18,6 +18,12 @@ namespace NodeCore.Realization
             return graph;
         }
 
+        public static IGraph<T> CreateGreedyGraph<T>(string Name)
+        {
+            var graph = new DijkstraGraph<T>(Name, g => new DijkstraGreedyNodeProcessor<T>(g));
+            return graph;
+        }
+
         public static IGraph<T> CreateRecGraph<T>(string Name) 
         {
             var graph = new RecGraph<T>(Name);

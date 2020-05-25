@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using NodeCore.Base;
 using NodeCore.Realization.Services;
@@ -27,7 +28,9 @@ namespace NodeCore.Realization.DijkstraAStarAlg
             if (Start == Finish || Start.ConnectionLength == 0)
                 return new List<INode<T>>() { Start };
 
-            var queue = new List<INode<T>>();
+            var queue = new List<Tuple<INode<T>, double>>();
+            //var queueForContains = new HashSet<INode<T>>();
+
             var checkedNodes = new Dictionary<INode<T>, TupleStructure<double, INode<T>>>();
             var activeNode = Start;
             //var nearNode = Tuple.Create(Helper.CalculateDistance(Start.Point, Finish.Point), Start);
@@ -41,20 +44,30 @@ namespace NodeCore.Realization.DijkstraAStarAlg
                     var chNode = n.ChildNode;
                     var distance = n.Distance;
                     var newDistance = distance + checkedNodes[activeNode].Item1;
+                    var priority = newDistance + Helper.CalculateManhattanDistance(chNode.Point, Finish.Point);
 
                     if (checkedNodes.ContainsKey(chNode))
                     {
                         if (checkedNodes[chNode].Item1 > newDistance)
                         {
-                            if (!queue.Contains(chNode))// для оптимизации поиска можно использовать HashSet
-                                queue.Add(chNode);
+                            if (!ContainsNodeForList(queue, chNode)) 
+                            {
+                                queue.Add(Tuple.Create(chNode, priority));
+                            }
+
+                            //if (!queueForContains.Contains(chNode))// для оптимизации поиска можно использовать HashSet
+                            //{
+                            //    queueForContains.Add(chNode);
+                            //    queue.Add(Tuple.Create(chNode, priority));
+                            //}                                 
 
                             checkedNodes[chNode] = TupleStructure.Create(newDistance, activeNode);
                         }
                     }
                     else
                     {
-                        queue.Add(chNode);
+                        queue.Add(Tuple.Create(chNode, priority));
+                        //queueForContains.Add(chNode);
                         checkedNodes.Add(chNode, TupleStructure.Create(newDistance, activeNode));
 
                         //var newPointDistance = Helper.CalculateDistance(chNode.Point, Finish.Point);
@@ -66,8 +79,8 @@ namespace NodeCore.Realization.DijkstraAStarAlg
                 if (queue.Count == 0 || activeNode == Finish)
                     break;
 
-                var minNode = Helper.NodeFlightBirdSearch(queue, Finish.Point);
-                queue.Remove(minNode);// для оптимизации удаления можно использовать HashSet
+                var minNode = DequeueNodeForList(queue);
+                //queueForContains.Remove(minNode);// для оптимизации удаления можно использовать HashSet
                 activeNode = minNode;
             } while (true);
 
@@ -85,7 +98,35 @@ namespace NodeCore.Realization.DijkstraAStarAlg
         #endregion
 
         #region core
+        private INode<T> DequeueNodeForList(List<Tuple<INode<T>, double>> Collection)
+        {
+            int bestIndex = 0;
 
+            for (int i = 1; i < Collection.Count; ++i)
+            {
+                if (Collection[i].Item2 < Collection[bestIndex].Item2)
+                {
+                    bestIndex = i;
+                }
+            }
+
+            var bestItem = Collection[bestIndex].Item1;
+            Collection.RemoveAt(bestIndex);
+            return bestItem;
+        }
+
+        private bool ContainsNodeForList(List<Tuple<INode<T>, double>> Collection, INode<T> Node) 
+        {
+            for (var i = 0; i < Collection.Count; ++i)
+            {
+                if (Collection[i].Item1 == Node)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
         #endregion
     }
 }

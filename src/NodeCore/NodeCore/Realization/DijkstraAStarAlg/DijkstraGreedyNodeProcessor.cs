@@ -1,25 +1,22 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using NodeCore.Base;
 using NodeCore.Realization.Services;
+using NodeCore.Realization.Universal;
 
-namespace NodeCore.Realization.Universal
+namespace NodeCore.Realization.DijkstraAStarAlg
 {
-    abstract class UniversalBaseNodeProcessor<T> : INodeProcessor<T>
+    class DijkstraGreedyNodeProcessor<T> : UniversalBaseNodeProcessor<T>
     {
         #region interface
-        public event Action<object, List<INode<T>>> AsyncSearchComplete;
+        private DijkstraGraph<T> DGraph { get; }
 
-        public IGraph<T> Graph { get; }
-
-        public UniversalBaseNodeProcessor(IGraph<T> Graph)
+        public DijkstraGreedyNodeProcessor(DijkstraGraph<T> Graph) : base(Graph)
         {
-            this.Graph = Graph;
+            DGraph = Graph;
         }
 
-        public virtual List<INode<T>> SearchPath(INode<T> Start, INode<T> Finish)
+        public override List<INode<T>> SearchPath(INode<T> Start, INode<T> Finish)
         {
             if (Start == null || Finish == null)
                 throw new ProcessorEx("Start or Finish is null");
@@ -30,8 +27,8 @@ namespace NodeCore.Realization.Universal
             if (Start == Finish || Start.ConnectionLength == 0)
                 return new List<INode<T>>() { Start };
 
+            var queue = new List<INode<T>>();
             var queueForContains = new HashSet<INode<T>>();
-            var queueForDequeue = new Queue<INode<T>>();
 
             var checkedNodes = new Dictionary<INode<T>, TupleStructure<double, INode<T>>>();
             var activeNode = Start;
@@ -54,16 +51,16 @@ namespace NodeCore.Realization.Universal
                             if (!queueForContains.Contains(chNode))
                             {
                                 queueForContains.Add(chNode);
-                                queueForDequeue.Enqueue(chNode);
-                            }   
+                                queue.Add(chNode);
+                            } 
 
                             checkedNodes[chNode] = TupleStructure.Create(newDistance, activeNode);
                         }
                     }
                     else
                     {
+                        queue.Add(chNode);
                         queueForContains.Add(chNode);
-                        queueForDequeue.Enqueue(chNode);
                         checkedNodes.Add(chNode, TupleStructure.Create(newDistance, activeNode));
 
                         //var newPointDistance = Helper.CalculateDistance(chNode.Point, Finish.Point);
@@ -72,11 +69,12 @@ namespace NodeCore.Realization.Universal
                     }
                 }
 
-                if (queueForContains.Count == 0)
+                if (queue.Count == 0 || activeNode == Finish)
                     break;
 
-                var minNode = queueForDequeue.Dequeue();
+                var minNode = DequeueNodeForList(queue, Finish.Point);
                 queueForContains.Remove(minNode);
+
                 activeNode = minNode;
             } while (true);
 
@@ -91,41 +89,29 @@ namespace NodeCore.Realization.Universal
                 return RecoverPuth(checkedNodes, Start, newFinish /*nearNode.Item2*/);
             }
         }
-
-        public virtual async Task<List<INode<T>>> SearchPathAsync(INode<T> Start, INode<T> Finish)
-        {
-            var result = await Task.Run(() => SearchPath(Start, Finish));
-
-            AsyncSearchComplete?.Invoke(this, result);
-
-            return result;
-        }
-
-        public virtual void Dispose()
-        {           
-        }
         #endregion
 
         #region core
-        protected List<INode<T>> RecoverPuth(Dictionary<INode<T>, TupleStructure<double, INode<T>>> CheckedNodes, INode<T> Start, INode<T> Finish)
+        private INode<T> DequeueNodeForList(List<INode<T>> Collection, Point3D Finish)
         {
-            var activeNode = Finish;
-            var result = new List<INode<T>>() { Finish };
+            int bestIndex = 0;
+            var minL = Helper.CalculateDistance(Collection[0].Point, Finish);
 
-            if (Start != Finish)
+            for (int i = 1; i < Collection.Count; ++i)
             {
-                do
-                {
-                    activeNode = CheckedNodes[activeNode].Item2;
-                    result.Add(activeNode);
-                } while (activeNode != Start);
+                var newL = Helper.CalculateDistance(Collection[i].Point, Finish);
 
-                result.Reverse();
+                if (minL > newL)
+                {
+                    minL = newL;
+                    bestIndex = i;
+                }
             }
 
-            return result;
-        }        
+            var bestItem = Collection[bestIndex];
+            Collection.RemoveAt(bestIndex);
+            return bestItem;
+        }
         #endregion
     }
 }
-
