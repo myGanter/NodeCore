@@ -17,17 +17,13 @@ namespace NodeCore.Realization.DijkstraAStarAlg
             DGraph = Graph;
         }
 
-        public override List<INode<T>> SearchPath(INode<T> Start, INode<T> Finish)
+        public override void Dispose()
+        { }
+        #endregion
+
+        #region core
+        protected override List<INode<T>> SearchProcess(INode<T> Start, INode<T> Finish)
         {
-            if (Start == null || Finish == null)
-                throw new ProcessorEx("Start or Finish is null");
-
-            if (Start.Graph != Finish.Graph || Start.Graph != Graph)
-                throw new ProcessorEx("Nodes are in different graphs");
-
-            if (Start == Finish || Start.ConnectionLength == 0)
-                return new List<INode<T>>() { Start };
-
             var queue = new List<Tuple<INode<T>, double>>();
             //var queueForContains = new HashSet<INode<T>>();
 
@@ -50,7 +46,7 @@ namespace NodeCore.Realization.DijkstraAStarAlg
                     {
                         if (checkedNodes[chNode].Item1 > newDistance)
                         {
-                            if (!ContainsNodeForList(queue, chNode)) 
+                            if (!ContainsNodeForList(queue, chNode))
                             {
                                 queue.Add(Tuple.Create(chNode, priority));
                             }
@@ -95,9 +91,7 @@ namespace NodeCore.Realization.DijkstraAStarAlg
                 return RecoverPuth(checkedNodes, Start, newFinish /*nearNode.Item2*/);
             }
         }
-        #endregion
 
-        #region core
         private INode<T> DequeueNodeForList(List<Tuple<INode<T>, double>> Collection)
         {
             int bestIndex = 0;
